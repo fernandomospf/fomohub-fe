@@ -15,6 +15,9 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Popular from "./pages/Popular";
 import NotFound from "./pages/NotFound";
+import Events from "./pages/Events";
+import Marketplace from "./pages/Marketplace";
+import Professionals from "./pages/Professionals";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +40,9 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/popular" element={<Popular />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/professionals" element={<Professionals />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
