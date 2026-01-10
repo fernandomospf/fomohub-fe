@@ -61,8 +61,8 @@ export default function Workouts() {
         </div>
 
         {/* Add New Workout */}
-        <Link to="/workouts/new">
-          <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
+        <Link to="/workouts/new" >
+          <div style={{ marginTop: '1.5rem' }} className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
             <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
               <Plus className="w-6 h-6 text-primary-foreground" />
             </div>
@@ -76,9 +76,12 @@ export default function Workouts() {
         </Link>
 
         {/* Workout List */}
-        <div className="space-y-4">
+        <div className="space-y-4" style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
           {filteredWorkouts.map((workout) => (
-            <Link key={workout.id} to={`/workouts/${workout.id}`}>
+            <Link 
+              key={workout.id} 
+              to={`/workouts/${workout.id}`}
+            >
               <WorkoutCard
                 {...workout}
                 onFavorite={() => {}}

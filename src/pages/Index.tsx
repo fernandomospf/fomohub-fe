@@ -70,7 +70,7 @@ export default function Index() {
         {/* Popular Workouts */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">Treinos Populares</h3>
+            <h3 className="text-lg font-bold">Treinos em alta</h3>
             <Link
               to="/popular"
               className="text-sm text-primary flex items-center gap-1"
@@ -79,7 +79,7 @@ export default function Index() {
               <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 mb-4">
             {popularWorkouts.map((workout) => (
               <WorkoutCard
                 key={workout.id}

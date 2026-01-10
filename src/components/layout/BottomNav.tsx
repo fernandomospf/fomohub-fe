@@ -93,24 +93,26 @@ export function BottomNav() {
 
         {overflowItems.length > 0 && showMore && (
           <div ref={moreRef} className="absolute left-1/2 transform -translate-x-1/2 bottom-14 z-50">
-            <div className="glass-strong rounded-xl shadow p-2 w-44">
-              {overflowItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setShowMore(false)}
-                    className={cn(
-                      "flex items-center gap-3 py-2 px-3 rounded-md hover:bg-muted/40",
-                      isActive ? "text-primary" : "text-foreground"
-                    )}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="text-sm">{item.label}</span>
-                  </Link>
-                );
-              })}
+            <div ref={moreRef} className="absolute right16 bottom-8 z-50">
+              <div className="glass-strong rounded-xl shadow p-2 w-44">
+                {overflowItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setShowMore(false)}
+                      className={cn(
+                        "flex items-center gap-3 py-2 px-3 rounded-md hover:bg-muted/40",
+                        isActive ? "text-primary" : "text-foreground"
+                      )}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      <span className="text-sm">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
