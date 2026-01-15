@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Play, Clock, Flame, Edit2 } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -6,64 +6,97 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { ExerciseItem } from "@/components/workout/ExerciseItem";
 import { RestTimer } from "@/components/workout/RestTimer";
 import { Button } from "@/components/ui/button";
+import workoutPlanService from "@/api/workout-plan";
+import { Exercise } from "@/types/exercise";
 
-const exercisesData = [
-  { id: 1, name: "Supino Reto com Barra", sets: 4, reps: 12, weight: 60, restTime: 60 },
-  { id: 2, name: "Supino Inclinado com Halteres", sets: 4, reps: 10, weight: 24, restTime: 60 },
-  { id: 3, name: "Crucifixo na Máquina", sets: 3, reps: 12, weight: 40, restTime: 60 },
-  { id: 4, name: "Tríceps Corda", sets: 3, reps: 15, weight: 25, restTime: 45 },
-  { id: 5, name: "Tríceps Francês", sets: 3, reps: 12, weight: 15, restTime: 45 },
-];
+type ExerciseState = Exercise & {
+  completedSets: number;
+};
 
 export default function WorkoutDetail() {
   const { id } = useParams();
-  const [exercises, setExercises] = useState(
-    exercisesData.map((e) => ({ ...e, completedSets: 0 }))
-  );
+
+  const [exercises, setExercises] = useState<ExerciseState[]>([]);
   const [showTimer, setShowTimer] = useState(false);
   const [currentRestTime, setCurrentRestTime] = useState(60);
   const [isWorkoutStarted, setIsWorkoutStarted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+
+    let mounted = true;
+
+    async function loadWorkoutDetail() {
+      try {
+        setLoading(true);
+
+        const details = await workoutPlanService.getPlanById(id);
+
+        if (!mounted) return;
+
+        const mapped: ExerciseState[] = details.map((e) => ({
+          ...e,
+          completedSets: 0,
+        }));
+
+        setExercises(mapped);
+      } catch (err) {
+        console.error("[::WorkoutDetails::] - Erro ao buscar exercícios:", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    loadWorkoutDetail();
+
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
+
+  const handleWeightChange = (exerciseId: string, weight: number) => {
+    setExercises((prev) =>
+      prev.map((e) =>
+        e.id === exerciseId ? { ...e, weight } : e
+      )
+    );
+  };
+
+  const handleRestTimeChange = (exerciseId: string, restTime: number) => {
+    setExercises((prev) =>
+      prev.map((e) =>
+        e.id === exerciseId
+          ? { ...e, rest_time_seconds: restTime }
+          : e
+      )
+    );
+  };
+
+  const handleCompleteSet = (exerciseId: string) => {
+    setExercises((prev) =>
+      prev.map((e) => {
+        if (e.id !== exerciseId) return e;
+        if (e.completedSets >= e.sets) return e;
+
+        setCurrentRestTime(e.rest_time_seconds);
+        setShowTimer(true);
+
+        return {
+          ...e,
+          completedSets: e.completedSets + 1,
+        };
+      })
+    );
+  };
 
   const totalSets = exercises.reduce((acc, e) => acc + e.sets, 0);
-  const completedSets = exercises.reduce((acc, e) => acc + e.completedSets, 0);
-  const progress = (completedSets / totalSets) * 100;
-
-  const handleCompleteSet = (exerciseId: number) => {
-    const exercise = exercises.find((e) => e.id === exerciseId);
-    if (exercise && exercise.completedSets < exercise.sets) {
-      setExercises((prev) =>
-        prev.map((e) =>
-          e.id === exerciseId
-            ? { ...e, completedSets: e.completedSets + 1 }
-            : e
-        )
-      );
-      setCurrentRestTime(exercise.restTime);
-      setShowTimer(true);
-    }
-  };
-
-  const handleWeightChange = (exerciseId: number, weight: number) => {
-    setExercises((prev) =>
-      prev.map((e) => (e.id === exerciseId ? { ...e, weight } : e))
-    );
-  };
-
-  const handleRestTimeChange = (exerciseId: number, restTime: number) => {
-    setExercises((prev) =>
-      prev.map((e) => (e.id === exerciseId ? { ...e, restTime } : e))
-    );
-  };
-
-  if (showTimer) {
-    return (
-      <RestTimer
-        initialTime={currentRestTime}
-        onComplete={() => setShowTimer(false)}
-        onSkip={() => setShowTimer(false)}
-      />
-    );
-  }
+  const completedSets = exercises.reduce(
+    (acc, e) => acc + e.completedSets,
+    0
+  );
+  const progress =
+    totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
 
   return (
     <MobileLayout>
@@ -76,9 +109,14 @@ export default function WorkoutDetail() {
           </Button>
         }
       />
-
+      {showTimer && (
+        <RestTimer
+          initialTime={currentRestTime}
+          onComplete={() => setShowTimer(false)}
+          onSkip={() => setShowTimer(false)}
+        />
+      )}
       <div className="px-4 py-6 space-y-6">
-        {/* Workout Info */}
         <div className="glass rounded-2xl p-5">
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center gap-2 text-muted-foreground">
@@ -91,7 +129,6 @@ export default function WorkoutDetail() {
             </div>
           </div>
 
-          {/* Progress */}
           <div className="mb-4">
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-muted-foreground">Progresso</span>
@@ -113,6 +150,7 @@ export default function WorkoutDetail() {
               size="lg"
               className="w-full"
               onClick={() => setIsWorkoutStarted(true)}
+              disabled={loading}
             >
               <Play className="w-5 h-5 mr-2" />
               Iniciar Treino
@@ -120,21 +158,42 @@ export default function WorkoutDetail() {
           )}
         </div>
 
-        {/* Exercises */}
         <div className="space-y-4">
           <h3 className="font-bold text-lg">Exercícios</h3>
+
+          {loading && (
+            <p className="text-sm text-muted-foreground">
+              Carregando exercícios...
+            </p>
+          )}
+
+          {!loading && exercises.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              Nenhum exercício encontrado.
+            </p>
+          )}
+
           {exercises.map((exercise) => (
             <ExerciseItem
               key={exercise.id}
-              {...exercise}
+              name={exercise.name}
+              sets={exercise.sets}
+              reps={exercise.reps}
+              weight={exercise.weight}
+              restTime={exercise.rest_time_seconds}
+              completedSets={exercise.completedSets}
+              onWeightChange={(weight) =>
+                handleWeightChange(exercise.id, weight)
+              }
+              onRestTimeChange={(time) =>
+                handleRestTimeChange(exercise.id, time)
+              }
               onComplete={() => handleCompleteSet(exercise.id)}
-              onWeightChange={(weight) => handleWeightChange(exercise.id, weight)}
-              onRestTimeChange={(time) => handleRestTimeChange(exercise.id, time)}
             />
           ))}
         </div>
 
-        {progress === 100 && (
+        {progress === 100 && totalSets > 0 && (
           <div className="glass rounded-2xl p-6 text-center border-success/50">
             <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">🎉</span>

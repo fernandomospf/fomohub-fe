@@ -2,11 +2,11 @@ import { Heart, Clock, Flame, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface WorkoutCardProps {
-  title: string;
+  name: string;
   category: string;
   duration: string;
   calories: string;
-  exercises: number;
+  workout_exercises: Array<any>;
   isFavorite?: boolean;
   imageUrl?: string;
   onClick?: () => void;
@@ -14,11 +14,11 @@ interface WorkoutCardProps {
 }
 
 export function WorkoutCard({
-  title,
+  name,
   category,
   duration,
   calories,
-  exercises,
+  workout_exercises,
   isFavorite,
   imageUrl,
   onClick,
@@ -33,7 +33,7 @@ export function WorkoutCard({
         <div className="absolute inset-0 z-0">
           <img
             src={imageUrl}
-            alt={title}
+            alt={name}
             className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent" />
@@ -43,7 +43,7 @@ export function WorkoutCard({
       <div className="relative z-10 p-4">
         <div className="flex items-start justify-between mb-3">
           <span className="px-3 py-1 text-xs font-semibold rounded-full gradient-primary text-primary-foreground">
-            {category}
+            {category ? category : "Hipertrofia"}
           </span>
           <button
             onClick={(e) => {
@@ -61,18 +61,18 @@ export function WorkoutCard({
           </button>
         </div>
 
-        <h3 className="text-lg font-bold mb-2">{title}</h3>
+        <h3 className="text-lg font-bold mb-2">{name}</h3>
 
         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
           <div className="flex items-center gap-1.5">
             <Clock className="w-4 h-4" />
-            <span>{duration}</span>
+            <span>{duration ? duration : "60 min"}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Flame className="w-4 h-4 text-orange-500" />
-            <span>{calories}</span>
+            <span>{calories ? calories : "350 cal"}</span>
           </div>
-          <span>{exercises} exercícios</span>
+          <span>{workout_exercises?.length || 0} exercícios</span>
         </div>
 
         <div className="flex items-center justify-between">

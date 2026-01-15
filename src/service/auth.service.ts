@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { toast } from '@/components/ui/use-toast';
 
 export async function signIn(email: string, password: string) {
   const { error } = await supabase.auth.signInWithPassword({
@@ -11,16 +12,35 @@ export async function signIn(email: string, password: string) {
   }
 }
 
-export async function signUp(email: string, password: string) {
+export async function signUp(
+  email: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+  phoneNumber: string
+) {
   const { error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        name: `${firstName} ${lastName}`,
+        phone: phoneNumber,
+      },
+    },
   });
 
-  if (error) {
-    throw new Error(error.message);
+ if (error) {
+  if (error.message.includes('already registered')) {
+    toast({ 
+      title: 'Erro ao cadastrar',
+      description: 'Este email já está cadastrado' 
+    });
+    return;
   }
-}
+
+  throw error;
+}}
 
 export async function signInWithGoogle() {
   const { error } = await supabase.auth.signInWithOAuth({

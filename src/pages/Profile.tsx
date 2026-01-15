@@ -22,6 +22,10 @@ const measurements = [
   { label: "Coxa E", value: "59", change: 1.5 },
 ];
 
+const clearSession = () => {
+  localStorage.removeItem('sb-vwovflogqhbhqwrkjbch-auth-token');
+}
+
 export default function Profile() {
   return (
     <MobileLayout>
@@ -137,7 +141,7 @@ export default function Profile() {
             </Button>
           </Link>
           <Link to="/login">
-            <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive">
+            <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive" onClick={clearSession}>
               <LogOut className="w-5 h-5 mr-3" />
               Sair
             </Button>

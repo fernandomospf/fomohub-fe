@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Dumbbell, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Dumbbell, Mail, Lock, Eye, EyeOff, Phone, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import {signIn, signUp, signInWithGoogle} from '../service/auth.service';
+import { signIn, signUp, signInWithGoogle } from '../service/auth.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -10,6 +10,9 @@ export interface AuthFormData {
   email: string;
   password: string;
   confirmPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
 }
 
 
@@ -19,11 +22,13 @@ export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<AuthFormData>();
 
@@ -38,9 +43,10 @@ export default function Login() {
         if (data.password !== data.confirmPassword) {
           throw new Error('As senhas não coincidem');
         }
-        await signUp(data.email, data.password);
+        await signUp(data.email, data.password, data.firstName!, data.lastName!, data.phoneNumber!);
+        setIsLogin(true);
+        navigate('/Login');
       }
-
       navigate('/');
     } catch (err: any) {
       setErrorMessage(err.message);
@@ -48,6 +54,35 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  const onRememberMeChange = () => {
+    const existItem = localStorage.getItem('user_session');
+    if (!existItem) {
+      localStorage.setItem('user_session', JSON.stringify({
+        email: watch('email'),
+      }));
+    } else {
+      localStorage.removeItem('user_session');
+    }
+  }
+
+  useEffect(() => {
+    const savedSession = localStorage.getItem('user_session');
+
+    if (!savedSession) return;
+
+    try {
+      const parsed = JSON.parse(savedSession);
+
+      if (parsed?.email) {
+        setValue('email', parsed.email);
+        setRememberMe(true);
+      }
+    } catch {
+      localStorage.removeItem('user_session');
+    }
+  }, [setValue]);
+
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
@@ -74,10 +109,51 @@ export default function Login() {
                 required: 'Email é obrigatório',
               })}
             />
+
           </div>
           {errors.email && (
             <p className="text-sm text-red-500">{errors.email.message}</p>
           )}
+
+          {
+            !isLogin && (
+              <div className="grid gap-4">
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Nome"
+                    className="pl-12 h-14 bg-secondary border-0 rounded-xl"
+                    {...register('firstName', {
+                      required: 'Nome é obrigatório',
+                    })}
+                  />
+                </div>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Sobrenome"
+                    className="pl-12 h-14 bg-secondary border-0 rounded-xl"
+                    {...register('lastName', {
+                      required: 'Sobrenome é obrigatório',
+                    })}
+                  />
+                </div>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="string"
+                    placeholder="Celular (apenas números)"
+                    className="pl-12 h-14 bg-secondary border-0 rounded-xl"
+                    {...register('phoneNumber', {
+                      required: 'Celular é obrigatório',
+                    })}
+                  />
+                </div>
+              </div>
+            )
+          }
 
           {/* PASSWORD */}
           <div className="relative">
@@ -129,6 +205,31 @@ export default function Login() {
             </p>
           )}
 
+          <div className="flex items-center gap-2">
+            <Input
+              type="checkbox"
+              className="mt-1 w-4 h-4"
+              checked={rememberMe}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setRememberMe(checked);
+
+                if (checked) {
+                  localStorage.setItem(
+                    'user_session',
+                    JSON.stringify({ email: watch('email') })
+                  );
+                } else {
+                  localStorage.removeItem('user_session');
+                }
+              }}
+            />
+            <label className="text-sm text-muted-foreground">
+              Lembrar-me
+            </label>
+          </div>
+
+
           <Button
             variant="gradient"
             size="xl"
@@ -139,8 +240,8 @@ export default function Login() {
             {loading
               ? 'Processando...'
               : isLogin
-              ? 'Entrar'
-              : 'Criar Conta'}
+                ? 'Entrar'
+                : 'Criar Conta'}
           </Button>
         </form>
 
@@ -160,3 +261,17 @@ export default function Login() {
     </div>
   );
 }
+
+
+
+//  <p className="text-sm text-muted-foreground">
+//                 Ao se cadastrar, você concorda com nossos{' '}
+//                 <a href="#" className="text-primary hover:underline">
+//                   Termos de Serviço
+//                 </a>{' '}
+//                 e{' '}
+//                 <a href="#" className="text-primary hover:underline">
+//                   Política de Privacidade
+//                 </a>
+//                 .
+//               </p>
