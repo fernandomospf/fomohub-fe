@@ -101,7 +101,7 @@ export default function Index() {
   if (sessionLoading || loading) {
     return (
       <MobileLayout>
-        <PageHeader title="IronHub" />
+        <PageHeader title="Fomo" />
         <div className="flex items-center justify-center h-[60vh]">
           <p className="text-muted-foreground">
             Carregando seus dados...
@@ -114,7 +114,7 @@ export default function Index() {
   if (error) {
     return (
       <MobileLayout>
-        <PageHeader title="IronHub" />
+        <PageHeader title="Fomo" />
         <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
           <p className="text-destructive">{error}</p>
           <Button onClick={() => window.location.reload()}>
@@ -127,7 +127,7 @@ export default function Index() {
 
   return (
     <MobileLayout>
-      <PageHeader title="IronHub" showSettings />
+      <PageHeader title="Fomo" showSettings />
 
       <div className="px-4 py-6 space-y-6">
         <div className="glass rounded-2xl p-6 relative overflow-hidden">
@@ -178,7 +178,7 @@ export default function Index() {
             </Link>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 mb-4">
             {popularWorkouts.map((workout) => (
               <WorkoutCard
                 key={workout.id}

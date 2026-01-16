@@ -67,7 +67,7 @@ export default function Settings() {
         ))}
 
         <div className="text-center pt-8">
-          <p className="text-sm text-muted-foreground">IronHub v1.0.0</p>
+          <p className="text-sm text-muted-foreground">Fomo v1.0.0</p>
           <p className="text-xs text-muted-foreground mt-1">
             Feito com 💪 para atletas
           </p>

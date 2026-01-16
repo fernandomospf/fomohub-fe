@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Dumbbell, Mail, Lock, Eye, EyeOff, Phone, User } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Phone, User, Apple } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { signIn, signUp, signInWithGoogle } from '../service/auth.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Fomo from '../../public/fomo-logo.png';
+import Image from 'next/image';
 
 export interface AuthFormData {
   email: string;
@@ -89,11 +91,13 @@ export default function Login() {
       <div className="relative z-10 w-full max-w-sm">
         <div className="text-center mb-12">
           <div className="w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-glow">
-            <Dumbbell className="w-10 h-10 text-primary-foreground" />
+            <Image src={Fomo} alt="Fomo Logo" className="w-30-30 text-primary-foreground" />
           </div>
-          <h1 className="text-3xl font-bold text-gradient">IronHub</h1>
+          <h1 className="text-3xl font-bold text-gradient">
+            Fomo
+          </h1>
           <p className="text-muted-foreground mt-2">
-            Sua jornada fitness começa aqui
+            Conecte-se através do movimento.
           </p>
         </div>
 
@@ -231,7 +235,6 @@ export default function Login() {
 
 
           <Button
-            variant="gradient"
             size="xl"
             className="w-full"
             type="submit"
@@ -257,6 +260,31 @@ export default function Login() {
             </button>
           </p>
         </div>
+        {
+          isLogin && (
+            <>
+              <hr className='mt-10 mb-10' />
+              <div className='flex flex-col gap-5'>
+                <Button
+                  size="xl"
+                  className="w-full"
+                  type="submit"
+                  disabled={true}
+                >
+                  Google
+                </Button>
+                <Button
+                  size="xl"
+                  className="w-full"
+                  type="submit"
+                  disabled={true}
+                >
+                  <Apple />
+                  Apple
+                </Button>
+              </div>
+            </>)
+        }
       </div>
     </div>
   );
