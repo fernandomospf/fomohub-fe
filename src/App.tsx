@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Workouts from "./pages/Workouts";
 import WorkoutDetail from "./pages/WorkoutDetail";
-import NewWorkout from "./pages/NewWorkout";
+import NewWorkout from "./pages/NewWorkout/NewWorkout";
 import AIWorkout from "./pages/AIWorkout";
 import Ranking from "./pages/Ranking";
 import Chat from "./pages/Chat";

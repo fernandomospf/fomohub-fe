@@ -1,0 +1,22 @@
+.chipList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.addSportButton {
+    border: 0.5px solid #202126;
+    padding: 8px;
+    border-radius: 16px;
+    text-decoration: none;
+    background-color: #202126;
+    color: #7c3aed;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    text-underline-offset: 2px;
+}
+
+.addSportButton:hover {
+    text-decoration: underline;
+}
