@@ -1,0 +1,33 @@
+{
+    "new_workout": {
+        "title": "Nova Ficha",
+        "save": "Salvar",
+        "saving": "Salvando...",
+        "name_label": "Nome do Treino",
+        "name_placeholder": "Ex: Treino A - Push",
+        "goal_question": "Qual seu objetivo?",
+        "sport_type_question": "Qual tipo de exercicio você pretende criar?",
+        "add_sport_button": "Adicionar novo esporte",
+        "muscle_group_question": "Quais grupos musculares você pretende focar?",
+        "time_available": "Tempo disponível para treinar:",
+        "public_label": "Quer deixar pública sua ficha?",
+        "public_description": "Ao deixar sua ficha pública, outros usuários poderão visualizar e utilizar sua rotina de treino como referência.",
+        "yes": "Sim",
+        "no": "Não",
+        "exercises_title": "Exercícios",
+        "exercises_count": "{{count}} exercício",
+        "exercises_count_plural": "{{count}} exercícios",
+        "add_exercise_button": "Adicionar Exercício",
+        "exercise_name_placeholder": "Nome do exercício",
+        "sets_label": "Séries",
+        "reps_label": "Reps",
+        "weight_label": "Carga (kg)",
+        "rest_time_label": "Descanso (s)"
+    },
+    "toast": {
+        "success_title": "Ficha criada com sucesso!",
+        "success_description": "Sua nova ficha foi criada e estará disponível na lista de treinos.",
+        "error_title": "Erro ao criar ficha",
+        "error_description": "Ocorreu um erro ao criar sua ficha. Por favor, tente novamente."
+    }
+}

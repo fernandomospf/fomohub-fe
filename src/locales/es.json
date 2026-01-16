@@ -1,0 +1,33 @@
+{
+    "new_workout": {
+        "title": "Nueva Rutina",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "name_label": "Nombre del Entrenamiento",
+        "name_placeholder": "Ej: Entrenamiento A - Empuje",
+        "goal_question": "¿Cuál es tu objetivo?",
+        "sport_type_question": "¿Qué tipo de ejercicio pretendes crear?",
+        "add_sport_button": "Añadir nuevo deporte",
+        "muscle_group_question": "¿En qué grupos musculares pretendes enfocarte?",
+        "time_available": "Tiempo disponible para entrenar:",
+        "public_label": "¿Quieres hacer pública tu rutina?",
+        "public_description": "Al hacer pública tu rutina, otros usuarios podrán ver y utilizar tu rutina de entrenamiento como referencia.",
+        "yes": "Sí",
+        "no": "No",
+        "exercises_title": "Ejercicios",
+        "exercises_count": "{{count}} ejercicio",
+        "exercises_count_plural": "{{count}} ejercicios",
+        "add_exercise_button": "Añadir Ejercicio",
+        "exercise_name_placeholder": "Nombre del ejercicio",
+        "sets_label": "Series",
+        "reps_label": "Reps",
+        "weight_label": "Carga (kg)",
+        "rest_time_label": "Descanso (s)"
+    },
+    "toast": {
+        "success_title": "¡Rutina creada con éxito!",
+        "success_description": "Tu nueva rutina ha sido creada y estará disponible en la lista de entrenamientos.",
+        "error_title": "Error al crear la rutina",
+        "error_description": "Ocurrió un error al crear tu rutina. Por favor, inténtalo de nuevo."
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "new_workout": {
+        "title": "New Workout",
+        "save": "Save",
+        "saving": "Saving...",
+        "name_label": "Workout Name",
+        "name_placeholder": "Ex: Workout A - Push",
+        "goal_question": "What is your goal?",
+        "sport_type_question": "What type of exercise do you intend to create?",
+        "add_sport_button": "Add new sport",
+        "muscle_group_question": "Which muscle groups do you intend to focus on?",
+        "time_available": "Time available to train:",
+        "public_label": "Do you want to make your workout public?",
+        "public_description": "By making your workout public, other users will be able to view and use your routine as a reference.",
+        "yes": "Yes",
+        "no": "No",
+        "exercises_title": "Exercises",
+        "exercises_count": "{{count}} exercise",
+        "exercises_count_plural": "{{count}} exercises",
+        "add_exercise_button": "Add Exercise",
+        "exercise_name_placeholder": "Exercise Name",
+        "sets_label": "Sets",
+        "reps_label": "Reps",
+        "weight_label": "Weight (kg)",
+        "rest_time_label": "Rest (s)"
+    },
+    "toast": {
+        "success_title": "Workout created successfully!",
+        "success_description": "Your new workout has been created and will be available in the workout list.",
+        "error_title": "Error creating workout",
+        "error_description": "An error occurred while creating your workout. Please try again."
+    }
+}
