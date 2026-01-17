@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import workoutPlanService from "@/api/workout-plan";
+import { Loading } from "@/components/Loading";
 
 
 export default function Workouts() {
@@ -47,15 +48,7 @@ export default function Workouts() {
       <PageHeader title="Meus Treinos" />
       {
         loading ? (
-          <div className="flex flex-col items-center justify-center h-[60vh]" >
-            <Loader
-              className="animate-spin text-muted-foreground "
-              size={24}
-            />
-            <p className="text-muted-foreground">
-              Carregando seus treinos...
-            </p>
-          </div>
+          <Loading />
         ) : (
           <div className="px-4 py-6 space-y-6">
             <div className="relative">

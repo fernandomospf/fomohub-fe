@@ -7,10 +7,10 @@ const navItems = [
   { icon: Home, label: "Início", path: "/" },
   { icon: Dumbbell, label: "Treinos", path: "/workouts" },
   { icon: Sparkles, label: "IA", path: "/ai-workout" },
-  { icon: Trophy, label: "Ranking", path: "/ranking" },
-  { icon: ShoppingBag, label: "Loja", path: "/marketplace" },
-  { icon: Calendar, label: "Eventos", path: "/events" },
-  { icon: MessageCircle, label: "Chat", path: "/chat" },
+  // { icon: Trophy, label: "Ranking", path: "/ranking" },
+  // { icon: ShoppingBag, label: "Loja", path: "/marketplace" },
+  // { icon: Calendar, label: "Eventos", path: "/events" },
+  // { icon: MessageCircle, label: "Chat", path: "/chat" },
   { icon: User, label: "Perfil", path: "/profile" },
 ];
 

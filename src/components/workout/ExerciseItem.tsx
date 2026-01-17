@@ -15,6 +15,44 @@ interface ExerciseItemProps {
   onRestTimeChange: (time: number) => void;
 }
 
+interface HistorySet {
+  series: number;
+  reps: number;
+  weight: string;
+}
+
+interface HistorySession {
+  date: string;
+  sets: HistorySet[];
+}
+
+const MOCK_HISTORY: HistorySession[] = [
+  {
+    date: "15/01/2026",
+    sets: [
+      { series: 1, reps: 12, weight: "100kg" },
+      { series: 2, reps: 10, weight: "105kg" },
+      { series: 3, reps: 8, weight: "110kg" },
+    ],
+  },
+  {
+    date: "12/01/2026",
+    sets: [
+      { series: 1, reps: 12, weight: "95kg" },
+      { series: 2, reps: 12, weight: "95kg" },
+      { series: 3, reps: 12, weight: "95kg" },
+    ],
+  },
+  {
+    date: "10/01/2026",
+    sets: [
+      { series: 1, reps: 15, weight: "90kg" },
+      { series: 2, reps: 12, weight: "95kg" },
+      { series: 3, reps: 10, weight: "100kg" },
+    ],
+  },
+];
+
 export function ExerciseItem({
   name,
   sets,
@@ -27,6 +65,7 @@ export function ExerciseItem({
   onRestTimeChange,
 }: ExerciseItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [visibleHistoryCount, setVisibleHistoryCount] = useState(2);
   const isCompleted = completedSets >= sets;
   const progress = (completedSets / sets) * 100;
 
@@ -138,6 +177,45 @@ export function ExerciseItem({
             >
               <Check className="w-4 h-4 mr-2" />
               Concluir Série {completedSets + 1}
+            </Button>
+          )}
+        </div>
+      )}
+      {isExpanded && (
+        <div className="mt-4">
+          <label className="text-s text-muted-foreground mb-2 block">
+            Histórico de exercícios
+          </label>
+          <ul style={{ listStyle: "none" }}>
+            {MOCK_HISTORY.slice(0, visibleHistoryCount).map((session, sessionIndex) => (
+              <li key={sessionIndex} className="flex flex-col gap-2 text-xs mb-4">
+                <div className="font-semibold text-muted-foreground">
+                  Data: {session.date}
+                </div>
+                <div className="pl-2 flex flex-col gap-2">
+                  {session.sets.map((set, setIndex) => (
+                    <div key={setIndex} className="flex gap-3 text-muted-foreground">
+                      <span className="w-16">Série: {set.series}</span>
+                      <span className="w-16">Reps: {set.reps}</span>
+                      <span className="w-20">Carga: {set.weight}</span>
+                    </div>
+                  ))}
+                </div>
+                {sessionIndex <
+                  Math.min(visibleHistoryCount, MOCK_HISTORY.length) - 1 && (
+                    <hr className="mt-2 text-border" />
+                  )}
+              </li>
+            ))}
+          </ul>
+          {visibleHistoryCount < MOCK_HISTORY.length && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full mt-2 text-primary"
+              onClick={() => setVisibleHistoryCount((prev) => prev + 2)}
+            >
+              Ver mais histórico
             </Button>
           )}
         </div>

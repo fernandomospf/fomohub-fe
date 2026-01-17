@@ -57,8 +57,12 @@ export default function NewWorkout() {
     try {
       await workoutPlanService.createPlan({
         name: data.name,
-        isPublic: false,
+        isPublic: data.isPublic,
         exercises: data.exercises,
+        muscleGroups: data.muscleGroups,
+        goals: data.goals,
+        trainingTime: parseInt(data.trainingTime),
+        workoutType: data.workoutType,
       });
       toast({
         title: t('toast.success_title'),
@@ -224,7 +228,9 @@ export default function NewWorkout() {
 
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">{t('new_workout.exercises_title')}</h3>
+            <h3 className="font-semibold">
+              {t('new_workout.exercises_title')}
+            </h3>
             <span className="text-sm text-muted-foreground">
               {fields.length === 1 ? t('new_workout.exercises_count', { count: fields.length }) : t('new_workout.exercises_count_plural', { count: fields.length })}
             </span>

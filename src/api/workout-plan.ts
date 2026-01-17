@@ -93,6 +93,10 @@ export class WorkoutPlanService {
       weight: number;
       restTimeSeconds: number;
     }[];
+    muscleGroups: string[];
+    goals: string[];
+    trainingTime: number;
+    workoutType: string;
   }) {
     return this.authFetch(
       `${this.baseUrl}/workout-plans`,

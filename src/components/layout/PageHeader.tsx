@@ -1,9 +1,10 @@
 import { ArrowLeft, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface PageHeaderProps {
-  title: string;
+  title?: string;
   showBack?: boolean;
   showSettings?: boolean;
   rightElement?: React.ReactNode;
@@ -26,7 +27,7 @@ export function PageHeader({ title, showBack, showSettings, rightElement }: Page
               <ArrowLeft className="w-5 h-5" />
             </Button>
           )}
-          <h1 className="text-lg font-bold">{title}</h1>
+          <Image src="/fomo-logo.png" alt="Fomo Logo" width={60} height={60} />
         </div>
         <div className="flex items-center gap-2">
           {rightElement}

@@ -8,6 +8,7 @@ import { RestTimer } from "@/components/workout/RestTimer";
 import { Button } from "@/components/ui/button";
 import workoutPlanService from "@/api/workout-plan";
 import { Exercise } from "@/types/exercise";
+import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
 
 type ExerciseState = Exercise & {
   completedSets: number;
@@ -16,10 +17,15 @@ type ExerciseState = Exercise & {
 export default function WorkoutDetail() {
   const { id } = useParams();
 
+  const { startWorkout, endWorkout, activeWorkoutId } = useWorkoutSession();
   const [exercises, setExercises] = useState<ExerciseState[]>([]);
   const [showTimer, setShowTimer] = useState(false);
   const [currentRestTime, setCurrentRestTime] = useState(60);
-  const [isWorkoutStarted, setIsWorkoutStarted] = useState(false);
+
+  // Local state for UI, but derived or synced with global could be better.
+  // For now, let's allow local start to trigger global start.
+  // If we assume only ONE workout active at a time:
+  const isWorkoutStarted = activeWorkoutId === id;
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -149,7 +155,9 @@ export default function WorkoutDetail() {
               variant="gradient"
               size="lg"
               className="w-full"
-              onClick={() => setIsWorkoutStarted(true)}
+              onClick={() => {
+                if (id) startWorkout(id);
+              }}
               disabled={loading}
             >
               <Play className="w-5 h-5 mr-2" />
@@ -199,9 +207,12 @@ export default function WorkoutDetail() {
               <span className="text-3xl">🎉</span>
             </div>
             <h3 className="text-xl font-bold mb-2">Treino Concluído!</h3>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-4">
               Parabéns! Você completou todas as séries.
             </p>
+            <Button onClick={() => endWorkout()} variant="default" className="w-full">
+              Finalizar Treino
+            </Button>
           </div>
         )}
       </div>

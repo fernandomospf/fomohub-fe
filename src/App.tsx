@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { WorkoutSessionProvider } from "@/contexts/WorkoutSessionContext";
 import Index from "./pages/Index";
 import Workouts from "./pages/Workouts";
 import WorkoutDetail from "./pages/WorkoutDetail";
@@ -23,29 +24,31 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/workouts" element={<Workouts />} />
-          <Route path="/workouts/new" element={<NewWorkout />} />
-          <Route path="/workouts/:id" element={<WorkoutDetail />} />
-          <Route path="/ai-workout" element={<AIWorkout />} />
-          <Route path="/ranking" element={<Ranking />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/popular" element={<Popular />} />
-          <Route path="*" element={<NotFound />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/marketplace" element={<Marketplace />} />
-          <Route path="/professionals" element={<Professionals />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <WorkoutSessionProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/workouts" element={<Workouts />} />
+            <Route path="/workouts/new" element={<NewWorkout />} />
+            <Route path="/workouts/:id" element={<WorkoutDetail />} />
+            <Route path="/ai-workout" element={<AIWorkout />} />
+            {/* <Route path="/ranking" element={<Ranking />} /> */}
+            {/* <Route path="/chat" element={<Chat />} /> */}
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/popular" element={<Popular />} />
+            <Route path="*" element={<NotFound />} />
+            {/* <Route path="/events" element={<Events />} /> */}
+            {/* <Route path="/marketplace" element={<Marketplace />} /> */}
+            {/* <Route path="/professionals" element={<Professionals />} /> */}
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </WorkoutSessionProvider>
   </QueryClientProvider>
 );
 

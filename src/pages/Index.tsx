@@ -14,27 +14,8 @@ import { WorkoutCard } from "@/components/workout/WorkoutCard";
 import { Button } from "@/components/ui/button";
 import profileService from "@/api/profile";
 import { useSession } from "@/hooks/useSession";
-
-const popularWorkouts = [
-  {
-    id: 1,
-    title: "Treino Push - Peito & Tríceps",
-    category: "Força",
-    duration: "45min",
-    calories: "320 kcal",
-    exercises: 8,
-    isFavorite: true,
-  },
-  {
-    id: 2,
-    title: "Pernas Completo",
-    category: "Hipertrofia",
-    duration: "60min",
-    calories: "450 kcal",
-    exercises: 10,
-    isFavorite: false,
-  },
-];
+import { Loading } from "@/components/Loading";
+import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
 
 const stats = [
   {
@@ -62,6 +43,7 @@ const stats = [
 
 export default function Index() {
   const { session, loading: sessionLoading } = useSession();
+  const { isActive, elapsedSeconds, formatTime } = useWorkoutSession();
 
   const [userData, setUserData] = useState<Record<string, any> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -101,12 +83,8 @@ export default function Index() {
   if (sessionLoading || loading) {
     return (
       <MobileLayout>
-        <PageHeader title="Fomo" />
-        <div className="flex items-center justify-center h-[60vh]">
-          <p className="text-muted-foreground">
-            Carregando seus dados...
-          </p>
-        </div>
+        <PageHeader />
+        <Loading />
       </MobileLayout>
     );
   }
@@ -133,12 +111,28 @@ export default function Index() {
         <div className="glass rounded-2xl p-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl" />
           <div className="relative z-10">
-            <p className="text-muted-foreground mb-1">
-              Olá, {userData?.name.split(' ')[0] || userData?.email || "Atleta"} 💪
-            </p>
-            <h2 className="text-2xl font-bold mb-4">
-              Pronto para treinar?
-            </h2>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <div style={{ width: 'fit-content' }}>
+                <p className="text-muted-foreground mb-1">
+                  Olá, {userData?.name.split(' ')[0] || userData?.email || "Atleta"} 💪
+                </p>
+                <h2 className="text-2xl font-bold mb-4">
+                  Pronto para treinar?
+                </h2>
+              </div>
+              {/* <div>
+                <label className="text-sm font-medium opacity-80">Tempo de treino</label>
+                <div className="text-xl font-bold font-mono" style={{ textAlign: 'center' }}>
+                  {isActive ? formatTime(elapsedSeconds) : "--:--"}
+                </div>
+              </div> */}
+            </div>
             <Link to="/workouts">
               <Button variant="gradient" size="lg" className="w-full">
                 <Zap className="w-5 h-5 mr-2" />
@@ -148,7 +142,7 @@ export default function Index() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        {/* <div className="grid grid-cols-3 gap-3">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -163,11 +157,11 @@ export default function Index() {
               </p>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Workouts */}
         <div>
-          <div className="flex items-center justify-between mb-4">
+          {/* <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold">Treinos em alta</h3>
             <Link
               to="/popular"
@@ -176,22 +170,22 @@ export default function Index() {
               Ver todos
               <ChevronRight className="w-4 h-4" />
             </Link>
-          </div>
+          </div> */}
 
           <div className="space-y-4 mb-4">
-            {popularWorkouts.map((workout) => (
+            {/* {popularWorkouts.map((workout) => (
               <WorkoutCard
                 key={workout.id}
                 {...workout}
                 onClick={() => {}}
                 onFavorite={() => {}}
               />
-            ))}
+            ))} */}
           </div>
         </div>
 
         {/* IA Banner */}
-        <Link to="/ai-workout">
+        {/* <Link to="/ai-workout">
           <div className="gradient-primary rounded-2xl p-5 shadow-glow relative overflow-hidden">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10 blur-xl" />
             <div className="relative z-10 flex items-center justify-between">
@@ -208,7 +202,7 @@ export default function Index() {
               </div>
             </div>
           </div>
-        </Link>
+        </Link> */}
       </div>
     </MobileLayout>
   );
