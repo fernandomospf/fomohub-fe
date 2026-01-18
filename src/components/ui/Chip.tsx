@@ -20,6 +20,7 @@ function Chip({
                 color: selected ? 'white' : '#fff9f9',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
+                fontSize: '12px',
             }}
             onMouseEnter={(e) => {
                 if (!selected) {

@@ -19,6 +19,8 @@ import NotFound from "./pages/NotFound";
 import Events from "./pages/Events";
 import Marketplace from "./pages/Marketplace";
 import Professionals from "./pages/Professionals";
+import Consent from "./pages/Consent";
+import ParQuestionnaire from "./pages/ParQuestionnaire";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/login" element={<Login />} />
             <Route path="/popular" element={<Popular />} />
+            <Route path="/consentimento" element={<Consent />} />
+            <Route path="/questionario" element={<ParQuestionnaire />} />
             <Route path="*" element={<NotFound />} />
             {/* <Route path="/events" element={<Events />} /> */}
             {/* <Route path="/marketplace" element={<Marketplace />} /> */}

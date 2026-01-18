@@ -12,10 +12,15 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { WorkoutCard } from "@/components/workout/WorkoutCard";
 import { Button } from "@/components/ui/button";
-import profileService from "@/api/profile";
+import profileService from "@/api/profiles";
 import { useSession } from "@/hooks/useSession";
 import { Loading } from "@/components/Loading";
 import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
+import workoutPlanService from "@/api/workout-plan";
+import { Bomb } from 'lucide-react';
+import { TrendingPlans } from "@/components/TrendingPlans";
+import { UserData } from "@/types/user";
+import { Onboarding } from "./Onboarding";
 
 const stats = [
   {
@@ -45,9 +50,35 @@ export default function Index() {
   const { session, loading: sessionLoading } = useSession();
   const { isActive, elapsedSeconds, formatTime } = useWorkoutSession();
 
-  const [userData, setUserData] = useState<Record<string, any> | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [workoutPlan, setWorkoutPlan] = useState<any>(null);
+  const [visibleCount, setVisibleCount] = useState(2);
+
+  const handleShowMore = () => {
+    setVisibleCount((prev) => prev + 2);
+  };
+
+  const handleCollapse = () => {
+    setVisibleCount(2);
+  };
+
+  useEffect(() => {
+    const fetchWorkoutPlan = async () => {
+      try {
+        const response = await workoutPlanService.getWorkoutPlanPublic();
+        setWorkoutPlan(response);
+      } catch (err) {
+        console.error("Erro ao buscar plano de treino:", err);
+      }
+    };
+    fetchWorkoutPlan();
+  }, []);
+
+  const data = () => workoutPlan;
+  console.log('data', data());
 
   useEffect(() => {
     if (!session) return;
@@ -106,43 +137,82 @@ export default function Index() {
   return (
     <MobileLayout>
       <PageHeader title="Fomo" showSettings />
-
-      <div className="px-4 py-6 space-y-6">
-        <div className="glass rounded-2xl p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl" />
-          <div className="relative z-10">
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <div style={{ width: 'fit-content' }}>
-                <p className="text-muted-foreground mb-1">
-                  Olá, {userData?.name.split(' ')[0] || userData?.email || "Atleta"} 💪
-                </p>
-                <h2 className="text-2xl font-bold mb-4">
-                  Pronto para treinar?
-                </h2>
-              </div>
-              {/* <div>
+      {userData?.onboarding_completed ? (
+        <>
+          <div className="px-4 py-6 space-y-6">
+            <div className="glass rounded-2xl p-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl" />
+              <div className="relative z-10">
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div style={{ width: 'fit-content' }}>
+                    <p className="text-muted-foreground mb-1">
+                      Olá, {userData?.name?.split(' ')[0] || userData?.email || "Atleta"} 💪
+                    </p>
+                    <h2 className="text-2xl font-bold mb-4">
+                      Pronto para treinar?
+                    </h2>
+                  </div>
+                  {/* <div>
                 <label className="text-sm font-medium opacity-80">Tempo de treino</label>
                 <div className="text-xl font-bold font-mono" style={{ textAlign: 'center' }}>
                   {isActive ? formatTime(elapsedSeconds) : "--:--"}
                 </div>
               </div> */}
+                </div>
+                <Link to="/workouts">
+                  <Button variant="gradient" size="lg" className="w-full">
+                    <Zap className="w-5 h-5 mr-2" />
+                    Iniciar Treino
+                  </Button>
+                </Link>
+              </div>
             </div>
-            <Link to="/workouts">
-              <Button variant="gradient" size="lg" className="w-full">
-                <Zap className="w-5 h-5 mr-2" />
-                Iniciar Treino
-              </Button>
-            </Link>
-          </div>
-        </div>
+            <div>
+              <label className="text-md text-muted-foreground mb-2 block">
+                Treinos que estão BOMBANDO 💣
+              </label>
+              <div className="mt-4 flex flex-col gap-4">
+                {
+                  workoutPlan?.slice(0, visibleCount).map((workout: any) => (
+                    <TrendingPlans
+                      key={workout.id}
+                      {...workout}
+                      onClick={() => { }}
+                      onFavorite={() => { }}
+                    />
+                  ))
+                }
+              </div>
+              {workoutPlan && workoutPlan.length > 2 && (
+                <div className="mt-4 flex justify-center">
+                  {visibleCount < workoutPlan.length ? (
+                    <Button
+                      variant="outline"
+                      onClick={handleShowMore}
+                      className="w-full border-primary text-primary hover:bg-primary/10"
+                    >
+                      Ver mais
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={handleCollapse}
+                      className="w-full border-primary text-primary hover:bg-primary/10"
+                    >
+                      Recolher
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
 
-        {/* <div className="grid grid-cols-3 gap-3">
+            {/* <div className="grid grid-cols-3 gap-3">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -159,9 +229,9 @@ export default function Index() {
           ))}
         </div> */}
 
-        {/* Workouts */}
-        <div>
-          {/* <div className="flex items-center justify-between mb-4">
+            {/* Workouts */}
+            <div>
+              {/* <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold">Treinos em alta</h3>
             <Link
               to="/popular"
@@ -172,8 +242,8 @@ export default function Index() {
             </Link>
           </div> */}
 
-          <div className="space-y-4 mb-4">
-            {/* {popularWorkouts.map((workout) => (
+              <div className="space-y-4 mb-4">
+                {/* {popularWorkouts.map((workout) => (
               <WorkoutCard
                 key={workout.id}
                 {...workout}
@@ -181,11 +251,11 @@ export default function Index() {
                 onFavorite={() => {}}
               />
             ))} */}
-          </div>
-        </div>
+              </div>
+            </div>
 
-        {/* IA Banner */}
-        {/* <Link to="/ai-workout">
+            {/* IA Banner */}
+            {/* <Link to="/ai-workout">
           <div className="gradient-primary rounded-2xl p-5 shadow-glow relative overflow-hidden">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10 blur-xl" />
             <div className="relative z-10 flex items-center justify-between">
@@ -203,7 +273,11 @@ export default function Index() {
             </div>
           </div>
         </Link> */}
-      </div>
+          </div>
+        </>
+      ) : (
+        <Onboarding />
+      )}
     </MobileLayout>
   );
 }

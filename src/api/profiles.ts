@@ -1,6 +1,7 @@
+import { UserData } from '../types/user';
 import { supabase } from '../lib/supabase';
 
-export type Profile = Record<string, any>;
+export type Profile = UserData;
 
 const rawApiBase = process.env.NEXT_PUBLIC_IRONHUB_API_URL || 'http://localhost:8080';
 const API_BASE = rawApiBase;
@@ -80,6 +81,72 @@ export class ProfileService {
 		} catch (err: any) {
 			console.error('ProfileService.Get fetch error', err);
 			throw new Error(`Network request failed to ${url}: ${err?.message ?? String(err)}`);
+		}
+	}
+
+	public async CompletedOnboarding(payload: {
+		fitnessData: {
+			socialName?: string;
+			birthDate: string;
+			gender?: string;
+			heightCm: number;
+			weightKg: number;
+			goal: string;
+			experienceLevel: string;
+			trainingFrequency: string;
+		};
+		parq: {
+			hasHeartCondition: boolean;
+			chestPainDuringActivity: boolean;
+			chestPainLastMonth: boolean;
+			dizzinessOrFainting: boolean;
+			boneOrJointProblem: boolean;
+			usesHeartOrPressureMedication: boolean;
+			otherReasonNotToExercise: boolean;
+		};
+		consent: {
+			type: string;
+			accepted: boolean;
+			acceptedAt: string;
+			version: string;
+		};
+	}): Promise<{ success: boolean }> {
+		const token = await this.getToken();
+
+		if (!token) {
+			throw new Error('Usuário não autenticado');
+		}
+
+		const url = `${this.baseUrl}/profiles/onboarding`;
+
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify(payload),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(
+					`Request to ${url} failed: ${res.status} ${res.statusText} - ${body}`,
+				);
+			}
+
+			const text = await res.text();
+			if (!text) {
+				return { success: true };
+			}
+
+			return JSON.parse(text) as { success: boolean };
+		} catch (err: any) {
+			console.error('ProfileService.CompletedOnboarding error', err);
+			throw new Error(
+				`Network request failed to ${url}: ${err?.message ?? String(err)}`,
+			);
 		}
 	}
 }

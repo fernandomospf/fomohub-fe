@@ -22,6 +22,8 @@ export interface WorkoutPlan {
   createdAt: string;
   exercises?: WorkoutExercise[];
   likesCount?: number;
+  rating_average?: number | null;
+  ratings_count?: number;
 }
 
 export class WorkoutPlanService {
@@ -141,6 +143,12 @@ export class WorkoutPlanService {
   public async getPlanById(planId: string): Promise<Exercise[]> {
     return this.authFetch<Exercise[]>(
       `${this.baseUrl}/workout-plans/${planId}`,
+    )
+  }
+
+  public async getWorkoutPlanPublic(): Promise<WorkoutPlan[]> {
+    return this.authFetch<WorkoutPlan[]>(
+      `${this.baseUrl}/workout-plans/public`,
     )
   }
 

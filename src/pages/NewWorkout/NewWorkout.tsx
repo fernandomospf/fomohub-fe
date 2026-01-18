@@ -225,7 +225,7 @@ export default function NewWorkout() {
             />
           </div>
         </SectionWorkoutExercise>
-
+              
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">
