@@ -135,7 +135,7 @@ export default function Workouts() {
             </TabsList>
 
             <TabsContent value="meus-treinos">
-              <div className="space-y-4">
+              <div className="flex flex-col gap-2">
                 {filteredWorkouts.map((workout) => (
                   <Link key={workout.id} to={`/workouts/${workout.id}`}>
                     <WorkoutCard {...workout} />
@@ -152,7 +152,7 @@ export default function Workouts() {
 
             <TabsContent value="treinos-favoritos">
               {myFavoriteWorkouts.length > 0 ? (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-2">
                   {myFavoriteWorkouts.map((workout) => (
                     <Link key={workout.id} to={`/workouts/${workout.id}`}>
                       <WorkoutCard {...workout} />
@@ -168,7 +168,7 @@ export default function Workouts() {
 
             <TabsContent value="treinos-curtidos">
               {myLikedWorkouts.length > 0 ? (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-2">
                   {myLikedWorkouts.map((workout) => (
                     <Link key={workout.id} to={`/workouts/${workout.id}`}>
                       <WorkoutCard {...workout} />
