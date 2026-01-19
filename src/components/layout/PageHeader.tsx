@@ -10,7 +10,7 @@ interface PageHeaderProps {
   rightElement?: React.ReactNode;
 }
 
-export function PageHeader({ title, showBack, showSettings, rightElement }: PageHeaderProps) {
+export function PageHeader({ title = "", showBack, showSettings, rightElement }: PageHeaderProps) {
   const navigate = useNavigate();
 
   return (
@@ -28,6 +28,7 @@ export function PageHeader({ title, showBack, showSettings, rightElement }: Page
             </Button>
           )}
           <Image src="/fomo-logo.png" alt="Fomo Logo" width={60} height={60} />
+          <h1 className="text-lg font-bold">{title}</h1>
         </div>
         <div className="flex items-center gap-2">
           {rightElement}

@@ -1,4 +1,3 @@
-import { Exercise } from '@/types/exercise';
 import { supabase } from '../lib/supabase';
 
 const rawApiBase =
@@ -16,6 +15,7 @@ export interface WorkoutExercise {
 }
 
 export interface WorkoutPlan {
+  map: any;
   id: string;
   name: string;
   isPublic: boolean;
@@ -24,6 +24,28 @@ export interface WorkoutPlan {
   likesCount?: number;
   rating_average?: number | null;
   ratings_count?: number;
+}
+
+export interface ExerciseByIdResponse {
+  workout_plan_id: string;
+  name: string;
+  training_time: number;
+  muscle_groups: string[];
+  goals: string[];
+  is_public: boolean;
+  calories: number;
+  exercises: [
+    {
+      id: string;
+      name: string;
+      sets: number;
+      reps: number;
+      weight: number;
+      rest_time_seconds: number;
+      notes: string;
+      created_at: string;
+    }
+  ]
 }
 
 export class WorkoutPlanService {
@@ -134,14 +156,23 @@ export class WorkoutPlanService {
     );
   }
 
+  public async toggleFavorite(planId: string): Promise<{ favorite: boolean }> {
+    return this.authFetch<{ favorite: boolean }>(
+      `${this.baseUrl}/workout-plans/${planId}/favorite`,
+      {
+        method: 'POST',
+      },
+    );
+  }
+
   public async getAllMyPlans(): Promise<WorkoutPlan[]> {
     return this.authFetch<WorkoutPlan[]>(
       `${this.baseUrl}/workout-plans`,
     )
   }
 
-  public async getPlanById(planId: string): Promise<Exercise[]> {
-    return this.authFetch<Exercise[]>(
+  public async getPlanById(planId: string): Promise<ExerciseByIdResponse> {
+    return this.authFetch<ExerciseByIdResponse>(
       `${this.baseUrl}/workout-plans/${planId}`,
     )
   }
@@ -152,6 +183,17 @@ export class WorkoutPlanService {
     )
   }
 
+  public async listMyLikedPlans(): Promise<WorkoutPlan[]> {
+    return this.authFetch<WorkoutPlan[]>(
+      `${this.baseUrl}/workout-plans/liked`,
+    )
+  }
+
+  public async listMyFavoritePlans(): Promise<WorkoutPlan[]> {
+    return this.authFetch<WorkoutPlan[]>(
+      `${this.baseUrl}/workout-plans/favorite`,
+    )
+  }
 }
 
 export const workoutPlanService = new WorkoutPlanService();

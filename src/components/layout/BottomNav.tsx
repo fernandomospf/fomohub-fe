@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 const navItems = [
   { icon: Home, label: "Início", path: "/" },
   { icon: Dumbbell, label: "Treinos", path: "/workouts" },
-  { icon: Sparkles, label: "IA", path: "/ai-workout" },
+  // { icon: Sparkles, label: "IA", path: "/ai-workout" },
   // { icon: Trophy, label: "Ranking", path: "/ranking" },
   // { icon: ShoppingBag, label: "Loja", path: "/marketplace" },
   // { icon: Calendar, label: "Eventos", path: "/events" },

@@ -81,7 +81,9 @@ export function ExerciseItem({
         className="cursor-pointer"
       >
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold">{name}</h4>
+          <h4 className="text-lg text-muted-foreground mb-2 block">
+            {name}
+          </h4>
           <div
             className={cn(
               "w-8 h-8 rounded-full flex items-center justify-center transition-all",

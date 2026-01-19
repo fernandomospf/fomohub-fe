@@ -2,7 +2,6 @@ import {
   Flame,
   Trophy,
   TrendingUp,
-  ChevronRight,
   Zap,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -10,14 +9,12 @@ import { useEffect, useState } from "react";
 
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { WorkoutCard } from "@/components/workout/WorkoutCard";
 import { Button } from "@/components/ui/button";
 import profileService from "@/api/profiles";
 import { useSession } from "@/hooks/useSession";
 import { Loading } from "@/components/Loading";
 import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
-import workoutPlanService from "@/api/workout-plan";
-import { Bomb } from 'lucide-react';
+import workoutPlanService, { WorkoutPlan } from "@/api/workout-plan";
 import { TrendingPlans } from "@/components/TrendingPlans";
 import { UserData } from "@/types/user";
 import { Onboarding } from "./Onboarding";
@@ -54,7 +51,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [workoutPlan, setWorkoutPlan] = useState<any>(null);
+  const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan[]>(null);
   const [visibleCount, setVisibleCount] = useState(2);
 
   const handleShowMore = () => {
@@ -76,9 +73,6 @@ export default function Index() {
     };
     fetchWorkoutPlan();
   }, []);
-
-  const data = () => workoutPlan;
-  console.log('data', data());
 
   useEffect(() => {
     if (!session) return;
@@ -158,12 +152,7 @@ export default function Index() {
                       Pronto para treinar?
                     </h2>
                   </div>
-                  {/* <div>
-                <label className="text-sm font-medium opacity-80">Tempo de treino</label>
-                <div className="text-xl font-bold font-mono" style={{ textAlign: 'center' }}>
-                  {isActive ? formatTime(elapsedSeconds) : "--:--"}
-                </div>
-              </div> */}
+
                 </div>
                 <Link to="/workouts">
                   <Button variant="gradient" size="lg" className="w-full">
@@ -179,12 +168,10 @@ export default function Index() {
               </label>
               <div className="mt-4 flex flex-col gap-4">
                 {
+
                   workoutPlan?.slice(0, visibleCount).map((workout: any) => (
                     <TrendingPlans
-                      key={workout.id}
                       {...workout}
-                      onClick={() => { }}
-                      onFavorite={() => { }}
                     />
                   ))
                 }
@@ -212,67 +199,13 @@ export default function Index() {
               )}
             </div>
 
-            {/* <div className="grid grid-cols-3 gap-3">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="glass rounded-xl p-3 text-center"
-            >
-              <stat.icon
-                className={`w-5 h-5 mx-auto mb-2 ${stat.color}`}
-              />
-              <p className="text-lg font-bold">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">
-                {stat.unit}
-              </p>
-            </div>
-          ))}
-        </div> */}
 
-            {/* Workouts */}
-            <div>
-              {/* <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">Treinos em alta</h3>
-            <Link
-              to="/popular"
-              className="text-sm text-primary flex items-center gap-1"
-            >
-              Ver todos
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div> */}
 
-              <div className="space-y-4 mb-4">
-                {/* {popularWorkouts.map((workout) => (
-              <WorkoutCard
-                key={workout.id}
-                {...workout}
-                onClick={() => {}}
-                onFavorite={() => {}}
-              />
-            ))} */}
-              </div>
-            </div>
 
-            {/* IA Banner */}
-            {/* <Link to="/ai-workout">
-          <div className="gradient-primary rounded-2xl p-5 shadow-glow relative overflow-hidden">
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10 blur-xl" />
-            <div className="relative z-10 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-primary-foreground mb-1">
-                  Treino com IA
-                </h3>
-                <p className="text-sm text-primary-foreground/80">
-                  Gere treinos personalizados
-                </p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Zap className="w-6 h-6 text-primary-foreground" />
-              </div>
-            </div>
-          </div>
-        </Link> */}
+
+
+
+
           </div>
         </>
       ) : (

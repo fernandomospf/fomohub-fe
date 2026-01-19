@@ -1,12 +1,14 @@
 interface ChipProps {
     label: string;
     selected?: boolean;
+    view?: boolean;
     onClick?: () => void;
 }
 
 function Chip({
     label,
     selected,
+    view = false,
     onClick,
 }: ChipProps) {
     return (
@@ -16,20 +18,22 @@ function Chip({
                 padding: '4px 8px',
                 borderRadius: '16px',
                 marginTop: '8px',
-                backgroundColor: selected ? '#7c3aed' : '#202126',
-                color: selected ? 'white' : '#fff9f9',
+                backgroundColor: selected || view ? '#7c3aed' : '#202126',
+                color: selected || view ? 'white' : '#fff9f9',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 fontSize: '12px',
+                fontWeight: 'bold',
+                letterSpacing: '.6px',
             }}
             onMouseEnter={(e) => {
-                if (!selected) {
+                if (!selected || !view) {
                     e.currentTarget.style.backgroundColor = '#7c3aed';
                     e.currentTarget.style.color = 'white';
                 }
             }}
             onMouseLeave={(e) => {
-                if (!selected) {
+                if (!selected || !view) {
                     e.currentTarget.style.backgroundColor = '#202126';
                     e.currentTarget.style.color = '#fff9f9';
                 }

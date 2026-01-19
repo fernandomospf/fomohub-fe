@@ -1,33 +1,62 @@
-import { Heart, Clock, Flame, ChevronRight } from "lucide-react";
+import { Heart, Clock, Flame, ChevronRight, Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface WorkoutCardProps {
-  name: string;
-  category: string;
-  duration: string;
-  calories: string;
-  workout_exercises: Array<any>;
-  isFavorite?: boolean;
-  imageUrl?: string;
-  onClick?: () => void;
-  onFavorite?: () => void;
-}
+import { useState } from "react";
+import { toast } from "sonner";
+import Chip from "../ui/Chip";
+import { WorkoutCardProps } from "./type";
+import workoutPlanService from "@/api/workout-plan";
 
 export function WorkoutCard({
+  id,
   name,
-  category,
   duration,
   calories,
   workout_exercises,
-  isFavorite,
+  muscle_groups,
+  is_favorited,
+  is_liked,
   imageUrl,
-  onClick,
   onFavorite,
 }: WorkoutCardProps) {
+  const [isLiked, setIsLiked] = useState<boolean>(is_liked ?? false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(is_favorited ?? false);
+
+  const handleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      const res = await workoutPlanService.toggleFavorite(id);
+
+      setIsFavorite(res.favorite);
+      toast.success(
+        res.favorite
+          ? "Treino adicionado aos favoritos"
+          : "Treino removido dos favoritos"
+      );
+
+      onFavorite?.();
+    } catch (err) {
+      toast.error("Erro ao atualizar favoritos");
+    }
+  };
+
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const res = workoutPlanService.toggleLike(id);
+    if (res) {
+      setIsLiked((prev) => !prev);
+      toast.success("Treino curtido");
+    } else {
+      toast.error("Erro ao curtir treino");
+    }
+  };
+
+  const CHIP_CATEGORY = [...muscle_groups]
   return (
     <div
-      onClick={onClick}
-      className="relative overflow-hidden rounded-2xl glass shadow-card cursor-pointer group transition-all duration-300 hover:scale-[1.02] hover:shadow-glow"
+      className="relative overflow-hidden rounded-2xl glass cursor-pointer group transition-all duration-300"
     >
       {imageUrl && (
         <div className="absolute inset-0 z-0">
@@ -39,26 +68,51 @@ export function WorkoutCard({
           <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent" />
         </div>
       )}
-      
+
       <div className="relative z-10 p-4">
         <div className="flex items-start justify-between mb-3">
-          <span className="px-3 py-1 text-xs font-semibold rounded-full gradient-primary text-primary-foreground">
-            {category ? category : "Hipertrofia"}
-          </span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onFavorite?.();
-            }}
-            className={cn(
-              "p-2 rounded-full transition-all",
-              isFavorite
-                ? "text-red-500 bg-red-500/20"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+          <div className="flex gap-2 flex-wrap">
+            {
+              CHIP_CATEGORY.slice(0, 4).map((chip, index) => (
+                <Chip key={index} label={chip} view={true} />
+              ))
+            }
+            {CHIP_CATEGORY.length > 3 && (
+              <Chip label="..." view={false} />
             )}
-          >
-            <Heart className={cn("w-5 h-5", isFavorite && "fill-current")} />
-          </button>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleFavorite}
+              className={cn(
+                "p-2 rounded-full transition-all",
+                isFavorite
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              )}
+            >
+              <Bookmark
+                className={cn(
+                  "w-5 h-5 transition-all",
+                  isFavorite && "fill-current"
+                )}
+              />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLike(e);
+              }}
+              className={cn(
+                "p-2 rounded-full transition-all",
+                isLiked
+                  ? "text-red-500"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              )}
+            >
+              <Heart className={cn("w-5 h-5", isLiked && "fill-current")} />
+            </button>
+          </div>
         </div>
 
         <h3 className="text-lg font-bold mb-2">{name}</h3>

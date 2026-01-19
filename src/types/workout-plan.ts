@@ -14,14 +14,11 @@ export interface WorkoutExercise {
 export interface WorkoutPlan {
   id: string;
   user_id: string;
-
   name: string;
   is_public: boolean;
   is_favorite: boolean;
-
   created_at: string;
   updated_at: string;
-
   workout_exercises?: WorkoutExercise[];
   likes?: number;
 }
@@ -32,8 +29,10 @@ export interface WorkoutPlanResponse {
     name: string;
     user_id: string;
     is_public: boolean;
+    calories: number;
     created_at: string;
     likes_count: number;
+    is_liked: boolean;
     rating_average: number | null;
     ratings_count: number;
     workout_exercises: WorkoutExercise[]; 

@@ -3,21 +3,28 @@ import { WorkoutPlanResponse } from "@/types/workout-plan";
 import { Star, Heart, Flame, Clock } from 'lucide-react';
 import { useState } from "react";
 import Chip from "../ui/Chip";
+import workoutPlanService from "@/api/workout-plan";
+import { toast } from "sonner";
 
 export function TrendingPlans({
     id,
     name,
-    user_id,
-    is_public,
-    created_at,
     likes_count,
-    rating_average,
+    calories,
     ratings_count,
-    workout_exercises
+    workout_exercises,
+    is_liked
 }: WorkoutPlanResponse) {
-    const [isLiked, setIsLiked] = useState(false);
-    const handleLike = () => {
-        setIsLiked(!isLiked);
+    const [isLiked, setIsLiked] = useState(is_liked ?? false);
+    const handleLike = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const res = workoutPlanService.toggleLike(id);
+        if (res) {
+            setIsLiked(!isLiked);
+            toast.success("Treino curtido");
+        } else {
+            toast.error("Erro ao curtir treino");
+        }
     };
 
     const MAX_RATING: number = 5;
@@ -46,14 +53,15 @@ export function TrendingPlans({
                         ))}
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Heart
-                        className={cn(
-                            "w-4 h-4 cursor-pointer transition-colors",
-                            isLiked ? "fill-red-500 stroke-none" : "text-muted-foreground"
-                        )}
-                        onClick={handleLike}
-                    />
+                <div className="flex flex-col items-center gap-2">
+                    <button onClick={handleLike}>
+                        <Heart
+                            className={cn(
+                                "w-4 h-4 cursor-pointer transition-colors",
+                                isLiked ? "fill-red-500 stroke-none" : "text-muted-foreground"
+                            )}
+                        />
+                    </button>
                     <label
                         className="text-xs text-muted-foreground"
                     >{likes_count}</label>
@@ -63,7 +71,7 @@ export function TrendingPlans({
             <div className="flex items-baseline gap-4 px-4 pb-4">
                 <div className="flex items-center gap-1.5">
                     <Flame className="w-4 h-4 text-orange-500" />
-                    <span className="text-sm text-muted-foreground">0</span>
+                    <span className="text-sm text-muted-foreground">{calories || 0} kcal</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-muted-foreground" />
