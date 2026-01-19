@@ -49,7 +49,7 @@ export default function Login() {
         setIsLogin(true);
         navigate('/Login');
       }
-      navigate('/');
+      navigate('/Login');
     } catch (err: any) {
       setErrorMessage(err.message);
     } finally {
@@ -260,7 +260,7 @@ export default function Login() {
             </button>
           </p>
         </div>
-        {
+        {/* {
           isLogin && (
             <>
               <hr className='mt-10 mb-10' />
@@ -284,7 +284,7 @@ export default function Login() {
                 </Button>
               </div>
             </>)
-        }
+        } */}
       </div>
     </div>
   );
