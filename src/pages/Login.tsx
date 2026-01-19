@@ -47,7 +47,7 @@ export default function Login() {
         }
         await signUp(data.email, data.password, data.firstName!, data.lastName!, data.phoneNumber!);
         setIsLogin(true);
-        navigate('/');
+        navigate('/Login');
       }
       navigate('/');
     } catch (err: any) {
