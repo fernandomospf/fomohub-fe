@@ -103,7 +103,7 @@ export default function Workouts() {
         <Loading />
       ) : hasWorkouts ? (
         <div className="px-4 py-6 space-y-6">
-          <div className="relative">
+          <div className="relative mb-4">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               placeholder="Buscar treinos..."
@@ -135,7 +135,7 @@ export default function Workouts() {
             </TabsList>
 
             <TabsContent value="meus-treinos">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-4">
                 {filteredWorkouts.map((workout) => (
                   <Link key={workout.id} to={`/workouts/${workout.id}`}>
                     <WorkoutCard {...workout} />

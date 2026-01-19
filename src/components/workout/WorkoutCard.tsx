@@ -56,7 +56,17 @@ export function WorkoutCard({
   const CHIP_CATEGORY = [...muscle_groups]
   return (
     <div
-      className="relative overflow-hidden rounded-2xl glass cursor-pointer group transition-all duration-300"
+      className="
+        relative 
+        overflow-hidden 
+        rounded-2xl 
+        glass 
+        cursor-pointer 
+        group 
+        transition-all 
+        duration-300
+        w-full
+        "
     >
       {imageUrl && (
         <div className="absolute inset-0 z-0">
