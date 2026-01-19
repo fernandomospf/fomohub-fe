@@ -28,7 +28,6 @@ export default function Workouts() {
     myLikedWorkouts.length > 0 ||
     myFavoriteWorkouts.length > 0;
 
-  // 🔹 Carga inicial
   useEffect(() => {
     let mounted = true;
 
@@ -61,7 +60,6 @@ export default function Workouts() {
     };
   }, []);
 
-  // 🔹 Recarrega ao trocar de aba
   useEffect(() => {
     let mounted = true;
 
@@ -136,7 +134,6 @@ export default function Workouts() {
               <TabsTrigger value="treinos-curtidos">Curtidos</TabsTrigger>
             </TabsList>
 
-            {/* 🏋️ Meus Treinos */}
             <TabsContent value="meus-treinos">
               <div className="space-y-4">
                 {filteredWorkouts.map((workout) => (
