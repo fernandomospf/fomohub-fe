@@ -177,7 +177,7 @@ export function Onboarding() {
 
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="min-h-fit bg-background flex flex-col">
             {/* Header */}
             <div className="px-5 pt-4 pb-2">
                 <div className="flex items-center justify-between mb-4">
@@ -548,7 +548,7 @@ export function Onboarding() {
             </div>
 
             {/* Footer */}
-            <div className="px-5 py-4 border-t border-border">
+            <div className="px-5 py-4 border-border">
                 <Button
                     onClick={handleNext}
                     disabled={!canProceed()}
