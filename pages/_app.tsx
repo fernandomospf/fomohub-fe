@@ -1,16 +1,27 @@
-import dynamic from "next/dynamic";
-import type { AppProps } from "next/app";
-
-const ClientApp = dynamic(() => import("../src/App"), { ssr: false });
-
+import { Toaster } from "@/components/atoms/toaster";
+import { Toaster as Sonner } from "@/components/atoms/sonner";
+import { TooltipProvider } from "@/components/atoms/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { WorkoutSessionProvider } from "@/contexts/WorkoutSessionContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import "../src/index.css";
-import { LanguageProvider } from "../src/contexts/LanguageContext";
+import type { AppProps } from "next/app";
+import { useState } from "react";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <LanguageProvider>
-      <ClientApp />
-    </LanguageProvider>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <WorkoutSessionProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <Component {...pageProps} />
+          </TooltipProvider>
+        </WorkoutSessionProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
   );
 }

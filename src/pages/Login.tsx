@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, Phone, User, Apple } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { signIn, signUp, signInWithGoogle } from '../service/auth.service';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
+import { useSession } from '@/hooks/useSession';
 import Fomo from '../../public/fomo-logo.png';
 import Image from 'next/image';
 
@@ -19,7 +20,8 @@ export interface AuthFormData {
 
 
 export default function Login() {
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { session } = useSession();
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -47,9 +49,9 @@ export default function Login() {
         }
         await signUp(data.email, data.password, data.firstName!, data.lastName!, data.phoneNumber!);
         setIsLogin(true);
-        navigate('/Login');
+        router.push('/login');
       }
-      navigate('/');
+      router.push('/');
     } catch (err: any) {
       setErrorMessage(err.message);
     } finally {
@@ -67,6 +69,12 @@ export default function Login() {
       localStorage.removeItem('user_session');
     }
   }
+
+  useEffect(() => {
+    if (session) {
+      router.push('/');
+    }
+  }, [session, router]);
 
   useEffect(() => {
     const savedSession = localStorage.getItem('user_session');

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Sparkles, Target, Clock, Dumbbell, Zap } from "lucide-react";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Button } from "@/components/ui/button";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { Button } from "@/components/atoms/button";
 import { cn } from "@/lib/utils";
 
 const goals = [

@@ -1,16 +1,15 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { MobileLayout } from "@/components/layout/MobileLayout";
+import { MobileLayout } from "@/components/templates/MobileLayout";
 import { FileQuestion, Home, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/atoms/button";
 
 const NotFound = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-  }, [location.pathname]);
+    console.error("404 Error: User attempted to access non-existent route:", router.asPath);
+  }, [router.asPath]);
 
   return (
     <MobileLayout hideNav>
@@ -27,7 +26,7 @@ const NotFound = () => {
 
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <Button
-            onClick={() => navigate("/")}
+            onClick={() => router.push("/")}
             className="w-full gradient-primary"
           >
             <Home className="w-4 h-4 mr-2" />
@@ -35,7 +34,7 @@ const NotFound = () => {
           </Button>
           <Button
             variant="outline"
-            onClick={() => navigate(-1)}
+            onClick={() => router.back()}
             className="w-full"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

@@ -1,7 +1,7 @@
 import { Moon, Bell, Shield, HelpCircle, Info, ChevronRight } from "lucide-react";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Switch } from "@/components/ui/switch";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { Switch } from "@/components/atoms/switch";
 
 const settingsGroups = [
   {

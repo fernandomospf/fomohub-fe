@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { Dumbbell, Plus, Search } from "lucide-react";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { WorkoutCard } from "@/components/workout/WorkoutCard";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { WorkoutCard } from "@/components/organisms/workout/WorkoutCard";
+import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/atoms/input";
+import Link from "next/link";
 import workoutPlanService from "@/api/workout-plan";
-import { Loading } from "@/components/Loading";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loading } from "@/components/atoms/Loading";
+import { EmptyState } from "@/components/atoms/empty-state";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/atoms/tabs";
 
 export default function Workouts() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -113,7 +113,7 @@ export default function Workouts() {
             />
           </div>
 
-          <Link to="/workouts/new">
+          <Link href="/workouts/new">
             <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
               <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
                 <Plus className="w-6 h-6 text-primary-foreground" />
@@ -137,7 +137,7 @@ export default function Workouts() {
             <TabsContent value="meus-treinos">
               <div className="flex flex-col gap-4">
                 {filteredWorkouts.map((workout) => (
-                  <Link key={workout.id} to={`/workouts/${workout.id}`}>
+                  <Link key={workout.id} href={`/workouts/${workout.id}`}>
                     <WorkoutCard {...workout} />
                   </Link>
                 ))}
@@ -154,7 +154,7 @@ export default function Workouts() {
               {myFavoriteWorkouts.length > 0 ? (
                 <div className="flex flex-col gap-2">
                   {myFavoriteWorkouts.map((workout) => (
-                    <Link key={workout.id} to={`/workouts/${workout.id}`}>
+                    <Link key={workout.id} href={`/workouts/${workout.id}`}>
                       <WorkoutCard {...workout} />
                     </Link>
                   ))}
@@ -170,7 +170,7 @@ export default function Workouts() {
               {myLikedWorkouts.length > 0 ? (
                 <div className="flex flex-col gap-2">
                   {myLikedWorkouts.map((workout) => (
-                    <Link key={workout.id} to={`/workouts/${workout.id}`}>
+                    <Link key={workout.id} href={`/workouts/${workout.id}`}>
                       <WorkoutCard {...workout} />
                     </Link>
                   ))}
@@ -190,7 +190,7 @@ export default function Workouts() {
             title="Nenhum treino cadastrado"
             description="Crie sua primeira ficha de treino e comece a acompanhar sua evolução!"
           >
-            <Link to="/workouts/new">
+            <Link href="/workouts/new">
               <Button className="gradient-primary">
                 <Plus className="w-4 h-4 mr-2" />
                 Criar primeiro treino

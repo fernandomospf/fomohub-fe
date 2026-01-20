@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { OnboardingLayout } from "@/components/OnboardingLayout";
+import { useRouter } from "next/router";
+import { OnboardingLayout } from "@/components/templates/OnboardingLayout";
 import { FileCheck, AlertTriangle, CheckCircle2, Circle } from "lucide-react";
 
 export default function Consent() {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const needsMedicalAdvice = location.state?.needsMedicalAdvice ?? false;
+    const router = useRouter();
+    const needsMedicalAdvice = router.query.needsMedicalAdvice === "true";
 
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [acceptedMedical, setAcceptedMedical] = useState(false);
@@ -14,7 +13,7 @@ export default function Consent() {
     const canContinue = acceptedTerms && (!needsMedicalAdvice || acceptedMedical);
 
     const handleComplete = () => {
-        navigate("/sucesso");
+        router.push("/");
     };
 
     return (

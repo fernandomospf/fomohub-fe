@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import {
     User,
@@ -17,11 +17,11 @@ import {
     Circle,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/atoms/input";
+import { Label } from "@/components/atoms/label";
+import { RadioGroup, RadioGroupItem } from "@/components/atoms/radio-group";
+import { Progress } from "@/components/atoms/progress";
 import profileService from "@/api/profiles";
 
 const objectives = [
@@ -56,7 +56,7 @@ const PAR_Q_QUESTIONS = [
 ];
 
 export function Onboarding() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [step, setStep] = useState(1);
     const totalSteps = 6;
 
@@ -171,7 +171,7 @@ export function Onboarding() {
             },
         });
 
-        navigate("/profile");
+        router.push("/profile");
     };
 
 

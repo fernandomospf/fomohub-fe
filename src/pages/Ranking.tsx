@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Camera, Users, Trophy, Plus } from "lucide-react";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { RankingCard } from "@/components/ranking/RankingCard";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { RankingCard } from "@/components/organisms/ranking/RankingCard";
+import { Button } from "@/components/atoms/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/atoms/tabs";
 import { cn } from "@/lib/utils";
 
 const rankingData = [

@@ -68,23 +68,33 @@ export class WorkoutPlanService {
   private async authFetch<T>(
     url: string,
     options?: RequestInit,
+    requireAuth: boolean = true
   ): Promise<T> {
     const token = await this.getToken();
 
-    if (!token) {
+    if (!token && requireAuth) {
       throw new Error('Usuário não autenticado');
+    }
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    };
+
+    if (token) {
+      (headers as any)['Authorization'] = `Bearer ${token}`;
     }
 
     const res = await fetch(url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        ...(options?.headers ?? {}),
-      },
+      headers,
     });
 
     if (!res.ok) {
+      if (res.status === 401) {
+        console.warn('Unauthorized request, signing out...');
+        await supabase.auth.signOut();
+      }
       const text = await res.text();
       throw new Error(`Request failed (${res.status}): ${text}`);
     }
@@ -104,6 +114,8 @@ export class WorkoutPlanService {
   public async getPublicPlans(): Promise<WorkoutPlan[]> {
     return this.authFetch<WorkoutPlan[]>(
       `${this.baseUrl}/workout-plans/public`,
+      undefined,
+      false
     );
   }
 
@@ -174,12 +186,16 @@ export class WorkoutPlanService {
   public async getPlanById(planId: string): Promise<ExerciseByIdResponse> {
     return this.authFetch<ExerciseByIdResponse>(
       `${this.baseUrl}/workout-plans/${planId}`,
+      undefined,
+      false
     )
   }
 
   public async getWorkoutPlanPublic(): Promise<WorkoutPlan[]> {
     return this.authFetch<WorkoutPlan[]>(
       `${this.baseUrl}/workout-plans/public`,
+      undefined,
+      false
     )
   }
 

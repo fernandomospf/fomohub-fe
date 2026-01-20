@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { OnboardingLayout } from "@/components/OnboardingLayout";
-import { ParQQuestion } from "@/components/ParQQuestion";
+import { useRouter } from "next/router";
+import { OnboardingLayout } from "@/components/templates/OnboardingLayout";
+import { ParQQuestion } from "@/components/molecules/ParQQuestion";
 import { AlertTriangle, ShieldCheck, Heart } from "lucide-react";
 
 const PAR_Q_QUESTIONS = [
@@ -15,7 +15,7 @@ const PAR_Q_QUESTIONS = [
 ];
 
 export default function ParQuestionnaire() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [answers, setAnswers] = useState<(boolean | null)[]>(
         new Array(PAR_Q_QUESTIONS.length).fill(null)
     );
@@ -30,7 +30,10 @@ export default function ParQuestionnaire() {
     const hasYesAnswer = answers.some((answer) => answer === true);
 
     const handleContinue = () => {
-        navigate("/consentimento", { state: { needsMedicalAdvice: hasYesAnswer } });
+        router.push({
+            pathname: "/consentimento",
+            query: { needsMedicalAdvice: hasYesAnswer ? "true" : "false" },
+        });
     };
 
     return (

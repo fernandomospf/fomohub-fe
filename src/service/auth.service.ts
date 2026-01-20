@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/components/atoms/use-toast';
 
 export async function signIn(email: string, password: string) {
   const { error } = await supabase.auth.signInWithPassword({

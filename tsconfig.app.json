@@ -27,6 +27,8 @@
     "useDefineForClassFields": true
   },
   "include": [
-    "src"
+    "src",
+    "pages",
+    "next-env.d.ts"
   ]
 }

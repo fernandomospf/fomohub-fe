@@ -4,18 +4,19 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Button } from "@/components/ui/button";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { Button } from "@/components/atoms/button";
 import profileService from "@/api/profiles";
 import { useSession } from "@/hooks/useSession";
-import { Loading } from "@/components/Loading";
+import { useRouter } from "next/router";
+import { Loading } from "@/components/atoms/Loading";
 import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
 import workoutPlanService, { WorkoutPlan } from "@/api/workout-plan";
-import { TrendingPlans } from "@/components/TrendingPlans";
+import { TrendingPlans } from "@/components/organisms/TrendingPlans";
 import { UserData } from "@/types/user";
 import { Onboarding } from "./Onboarding";
 
@@ -44,6 +45,7 @@ const stats = [
 ];
 
 export default function Index() {
+  const router = useRouter();
   const { session, loading: sessionLoading } = useSession();
   const { isActive, elapsedSeconds, formatTime } = useWorkoutSession();
 
@@ -51,7 +53,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan[]>(null);
+  const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan[]>([]);
   const [visibleCount, setVisibleCount] = useState(2);
 
   const handleShowMore = () => {
@@ -63,6 +65,8 @@ export default function Index() {
   };
 
   useEffect(() => {
+    if (sessionLoading || !session) return;
+
     const fetchWorkoutPlan = async () => {
       try {
         const response = await workoutPlanService.getWorkoutPlanPublic();
@@ -72,7 +76,7 @@ export default function Index() {
       }
     };
     fetchWorkoutPlan();
-  }, []);
+  }, [session, sessionLoading]);
 
   useEffect(() => {
     if (!session) return;
@@ -105,13 +109,18 @@ export default function Index() {
     };
   }, [session]);
 
-  if (sessionLoading || loading) {
+  if (sessionLoading || (session && loading)) {
     return (
       <MobileLayout>
         <PageHeader />
         <Loading />
       </MobileLayout>
     );
+  }
+
+  if (!session && !sessionLoading) {
+    router.push("/login");
+    return null;
   }
 
   if (error) {
@@ -154,7 +163,7 @@ export default function Index() {
                   </div>
 
                 </div>
-                <Link to="/workouts">
+                <Link href="/workouts">
                   <Button variant="gradient" size="lg" className="w-full">
                     <Zap className="w-5 h-5 mr-2" />
                     Iniciar Treino

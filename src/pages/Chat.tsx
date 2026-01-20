@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Send, Image } from "lucide-react";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { ChatMessage } from "@/components/chat/ChatMessage";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { ChatMessage } from "@/components/organisms/chat/ChatMessage";
+import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/atoms/input";
 
 const messages = [
   {

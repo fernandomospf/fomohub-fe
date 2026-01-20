@@ -1,24 +1,24 @@
 import { Plus, Save } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
 import { useForm, useFieldArray, UseFormRegister } from "react-hook-form";
 
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/atoms/input";
 import workoutPlanService from "@/api/workout-plan";
 import { toast } from "@/hooks/use-toast";
-import { Switch } from "@/components/ui/Switch";
-import Chip from "@/components/ui/Chip";
+import { Switch } from "@/components/atoms/switch";
+import Chip from "@/components/atoms/Chip";
 import { NewWorkoutForm } from "./types";
-import { TrainingCardCreate } from "@/components/TrainingCardCreate";
-import { FormWithExercises } from "@/components/TrainingCardCreate/type";
+import { TrainingCardCreate } from "@/components/organisms/TrainingCardCreate";
+import { FormWithExercises } from "@/components/organisms/TrainingCardCreate/type";
 import styles from "./NewWorkout.module.css";
 import { useTranslate } from "@/hooks/useTranslate";
 import { SectionWorkoutExercise } from "./fragments/SectionWorkoutExercise";
 
 export default function NewWorkout() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { t } = useTranslate();
 
   const {
@@ -68,7 +68,7 @@ export default function NewWorkout() {
         title: t('toast.success_title'),
         description: t('toast.success_description')
       });
-      navigate("/workouts");
+      router.push("/workouts");
     } catch (err) {
       toast({
         title: t('toast.error_title'),
@@ -219,13 +219,13 @@ export default function NewWorkout() {
             </span>
             <Switch
               checked={watch("isPublic")}
-              onChange={(value) =>
+              onCheckedChange={(value) =>
                 setValue("isPublic", value)
               }
             />
           </div>
         </SectionWorkoutExercise>
-              
+
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">

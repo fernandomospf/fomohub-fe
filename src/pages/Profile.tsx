@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Scale, Ruler, TrendingUp, Plus, Lock, Settings, LogOut } from "lucide-react";
-import { Link } from "react-router-dom";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { ProgressCard } from "@/components/progress/ProgressCard";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { ProgressCard } from "@/components/organisms/progress/ProgressCard";
+import { Button } from "@/components/atoms/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/atoms/tabs";
 
 const progressData = {
   weight: { current: "78.5", change: -1.5 },
@@ -134,13 +134,13 @@ export default function Profile() {
 
         {/* Quick Actions */}
         <div className="space-y-2">
-          <Link to="/settings">
+          <Link href="/settings">
             <Button variant="secondary" className="w-full justify-start">
               <Settings className="w-5 h-5 mr-3" />
               Configurações
             </Button>
           </Link>
-          <Link to="/login">
+          <Link href="/login">
             <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive" onClick={clearSession}>
               <LogOut className="w-5 h-5 mr-3" />
               Sair

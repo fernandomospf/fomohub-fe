@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Search, ShoppingCart, Filter, Heart, Store } from "lucide-react";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { ProductCard } from "@/components/marketplace/ProductCard";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { ProductCard } from "@/components/organisms/marketplace/ProductCard";
+import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/atoms/input";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const categories = [
   { id: "all", label: "Todos" },
@@ -107,7 +107,7 @@ export default function Marketplace() {
         title="Loja"
         rightElement={
           <div className="flex items-center gap-2">
-            <Link to="/marketplace/sell">
+            <Link href="/marketplace/sell">
               <Button variant="ghost" size="icon-sm" className="rounded-full">
                 <Store className="w-5 h-5" />
               </Button>
@@ -162,7 +162,7 @@ export default function Marketplace() {
             <p className="text-sm text-primary-foreground/80 mb-3">
               Cadastre sua loja e alcance milhares de atletas
             </p>
-            <Link to="/marketplace/sell">
+            <Link href="/marketplace/sell">
               <Button variant="glass" size="sm" className="bg-white/20 hover:bg-white/30 text-primary-foreground">
                 <Store className="w-4 h-4 mr-2" />
                 Cadastrar Loja

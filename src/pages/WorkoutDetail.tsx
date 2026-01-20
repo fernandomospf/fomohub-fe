@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { Play, Clock, Flame } from "lucide-react";
-import { useParams } from "react-router-dom";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { ExerciseItem } from "@/components/workout/ExerciseItem";
-import { RestTimer } from "@/components/workout/RestTimer";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/router";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { ExerciseItem } from "@/components/organisms/workout/ExerciseItem";
+import { RestTimer } from "@/components/organisms/workout/RestTimer";
+import { Button } from "@/components/atoms/button";
 import workoutPlanService from "@/api/workout-plan";
 import { Exercise } from "@/types/exercise";
 import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
-import { Loading } from "@/components/Loading";
+import { Loading } from "@/components/atoms/Loading";
 
 type ExerciseState = Exercise & {
   completedSets: number;
@@ -25,7 +25,8 @@ type ExerciseState = Exercise & {
 };
 
 export default function WorkoutDetail() {
-  const { id } = useParams();
+  const router = useRouter();
+  const { id } = router.query as { id: string };
   const { startWorkout, endWorkout, activeWorkoutId } = useWorkoutSession();
   const [exercises, setExercises] = useState<ExerciseState[]>([]);
   const [showTimer, setShowTimer] = useState(false);

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Search, Filter, TrendingUp } from "lucide-react";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { WorkoutCard } from "@/components/workout/WorkoutCard";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { WorkoutCard } from "@/components/organisms/workout/WorkoutCard";
+import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/atoms/input";
 
 const popularWorkouts = [
   {

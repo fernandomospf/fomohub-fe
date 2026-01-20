@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Search, Plus, Filter, Calendar as CalendarIcon, MapPin, Ticket } from "lucide-react";
-import { MobileLayout } from "@/components/layout/MobileLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { MobileLayout } from "@/components/templates/MobileLayout";
+import { PageHeader } from "@/components/templates/PageHeader";
+import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/atoms/input";
 import { cn } from "@/lib/utils";
-import { EventCard } from "@/components/events/EventCard";
+import { EventCard } from "@/components/organisms/events/EventCard";
 
 const categories = [
   { id: "all", label: "Todos", icon: Ticket },
