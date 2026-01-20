@@ -70,7 +70,7 @@ export default function Index() {
     const fetchWorkoutPlan = async () => {
       try {
         const response = await workoutPlanService.getWorkoutPlanPublic();
-        setWorkoutPlan(response);
+        setWorkoutPlan(response || []);
       } catch (err) {
         console.error("Erro ao buscar plano de treino:", err);
       }

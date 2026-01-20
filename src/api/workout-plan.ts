@@ -94,6 +94,11 @@ export class WorkoutPlanService {
       if (res.status === 401) {
         console.warn('Unauthorized request, signing out...');
         await supabase.auth.signOut();
+        return null as T;
+      }
+      if (res.status >= 500) {
+        console.error(`Server error (${res.status}):`, await res.text());
+        return null as T;
       }
       const text = await res.text();
       throw new Error(`Request failed (${res.status}): ${text}`);

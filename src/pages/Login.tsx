@@ -8,6 +8,7 @@ import { Input } from '@/components/atoms/input';
 import { useSession } from '@/hooks/useSession';
 import Fomo from '../../public/fomo-logo.png';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 export interface AuthFormData {
   email: string;
@@ -49,6 +50,7 @@ export default function Login() {
         }
         await signUp(data.email, data.password, data.firstName!, data.lastName!, data.phoneNumber!);
         setIsLogin(true);
+        toast.success('Conta criada com sucesso!\n Verifique seu email para confirmar o cadastro.');
         router.push('/login');
       }
       router.push('/');
@@ -110,7 +112,6 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* EMAIL */}
           <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
@@ -177,8 +178,8 @@ export default function Login() {
               {...register('password', {
                 required: 'Senha é obrigatória',
                 minLength: {
-                  value: 6,
-                  message: 'Senha deve ter no mínimo 6 caracteres',
+                  value: 8,
+                  message: 'Senha deve ter no mínimo 8 caracteres',
                 },
               })}
             />
@@ -190,6 +191,13 @@ export default function Login() {
               {showPassword ? <EyeOff /> : <Eye />}
             </button>
           </div>
+          {
+            !isLogin && (
+              <p className="text-xs text-muted-foreground ml-2 text-left">
+                * Senha deve ter no mínimo 8 caracteres com letras maiúsculas, minúsculas e números
+              </p>
+            )
+          }
           {errors.password && (
             <p className="text-sm text-red-500">{errors.password.message}</p>
           )}

@@ -66,6 +66,11 @@ export class ProfileService {
 				if (res.status === 401) {
 					console.warn('Unauthorized request in ProfileService, signing out...');
 					await supabase.auth.signOut();
+					return null;
+				}
+				if (res.status >= 500) {
+					console.error(`Server error (${res.status}) in ProfileService:`, await res.text());
+					return null;
 				}
 				const body = await res.text();
 				throw new Error(`Request to ${url} failed: ${res.status} ${res.statusText} - ${body}`);

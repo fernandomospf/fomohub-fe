@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 
 const navItems = [
-  { icon: Home, label: "Início", path: "/" },
+  { icon: Home, label: "Feed", path: "/" },
   { icon: Dumbbell, label: "Treinos", path: "/workouts" },
   // { icon: Sparkles, label: "IA", path: "/ai-workout" },
   // { icon: Trophy, label: "Ranking", path: "/ranking" },
