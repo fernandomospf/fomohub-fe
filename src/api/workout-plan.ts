@@ -5,6 +5,14 @@ const rawApiBase =
 
 const API_BASE = rawApiBase.replace(/\/$/, '');
 
+export interface WorkoutSession {
+  id: string;
+  workout_plan_id: string;
+  user_id: string;
+  started_at: string;
+  finished_at: string | null;
+}
+
 export interface WorkoutExercise {
   id?: string;
   name: string;
@@ -13,6 +21,38 @@ export interface WorkoutExercise {
   weight: number;
   restTimeSeconds: number;
 }
+
+type ActiveWorkoutSession = {
+  sessionId: string;
+  startedAt: string;
+  exercises: Array<{
+    workout_exercise_id: string;
+    name: string;
+    sets: number;
+    reps: number;
+    weight: number;
+    rest_time_seconds: number;
+    completed_sets: number;
+  }>;
+};
+
+export interface ExerciseHistory {
+  exercise_id: string;
+  exercise_name: string;
+  planned_sets: number;
+  planned_reps: number;
+  planned_weight: number;
+  history: {
+    date: string;
+    sets: {
+      set: number;
+      reps: number;
+      weight: number;
+    }[];
+  }[];
+}
+
+
 
 export interface WorkoutPlan {
   map: any;
@@ -215,6 +255,60 @@ export class WorkoutPlanService {
       `${this.baseUrl}/workout-plans/favorite`,
     )
   }
+
+  public async startWorkoutSession(planId: string): Promise<WorkoutSession> {
+    return this.authFetch<WorkoutSession>(
+      `${this.baseUrl}/workout-plans/workout-sessions/start`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ planId: planId }),
+      },
+    )
+  }
+
+  public async addSetToSession(
+    sessionId: string,
+    payload: {
+      workout_exercise_id: string;
+      set_number: number;
+      reps: number;
+      weight: number;
+      rest_seconds?: number;
+    }
+  ): Promise<void> {
+    return this.authFetch<void>(
+      `${this.baseUrl}/workout-plans/workout-sessions/${sessionId}/sets`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  public async getActiveWorkoutSession(planId: string): Promise<ActiveWorkoutSession> {
+    return this.authFetch<ActiveWorkoutSession>(
+      `${this.baseUrl}/workout-plans/${planId}/active`,
+    )
+  }
+
+  public async finishWorkoutSession(sessionId: string): Promise<void> {
+    return this.authFetch<void>(
+      `${this.baseUrl}/workout-plans/workout-sessions/${sessionId}/finish`,
+      {
+        method: 'PATCH',
+      },
+    );
+  }
+
+  public async getExerciseHistory(
+    exerciseId: string
+  ): Promise<ExerciseHistory | null> {
+    return this.authFetch<ExerciseHistory>(
+      `${this.baseUrl}/workout-plans/exercises/${exerciseId}/history`,
+    );
+  }
+
+
 }
 
 export const workoutPlanService = new WorkoutPlanService();

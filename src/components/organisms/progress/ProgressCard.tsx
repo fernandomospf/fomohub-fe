@@ -4,21 +4,21 @@ import { cn } from "@/lib/utils";
 interface ProgressCardProps {
   label: string;
   value: string;
-  unit: string;
-  change?: number;
+  unit?: string;
+  change?: number | string;
   icon?: React.ReactNode;
 }
 
 export function ProgressCard({ label, value, unit, change, icon }: ProgressCardProps) {
   const getTrendIcon = () => {
     if (!change || change === 0) return <Minus className="w-4 h-4" />;
-    if (change > 0) return <TrendingUp className="w-4 h-4" />;
+    if (Number(change) > 0) return <TrendingUp className="w-4 h-4" />;
     return <TrendingDown className="w-4 h-4" />;
   };
 
   const getTrendColor = () => {
     if (!change || change === 0) return "text-muted-foreground";
-    if (change > 0) return "text-success";
+    if (Number(change) > 0) return "text-success";
     return "text-destructive";
   };
 
@@ -41,7 +41,7 @@ export function ProgressCard({ label, value, unit, change, icon }: ProgressCardP
       {change !== undefined && (
         <div className={cn("flex items-center gap-1 text-sm", getTrendColor())}>
           {getTrendIcon()}
-          <span>{Math.abs(change)} {unit} desde o último registro</span>
+          <span>{Math.abs(Number(change))} {unit} desde o último registro</span>
         </div>
       )}
     </div>

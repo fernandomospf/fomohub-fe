@@ -1,73 +1,81 @@
-import { useState } from "react";
-import { Check, Minus, Plus, Timer } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/atoms/button";
 import { cn } from "@/lib/utils";
+import workoutPlanService, { ExerciseHistory } from "@/api/workout-plan";
 
 interface ExerciseItemProps {
+  id: string;
   name: string;
   sets: number;
   reps: number;
   weight: number;
   restTime: number;
   completedSets: number;
+  exerciseId: string;
+  workoutSessionId: string | null;
   onComplete: () => void;
   onWeightChange: (weight: number) => void;
   onRestTimeChange: (time: number) => void;
 }
 
-interface HistorySet {
-  series: number;
-  reps: number;
-  weight: string;
-}
-
-interface HistorySession {
-  date: string;
-  sets: HistorySet[];
-}
-
-const MOCK_HISTORY: HistorySession[] = [
-  {
-    date: "15/01/2026",
-    sets: [
-      { series: 1, reps: 12, weight: "100kg" },
-      { series: 2, reps: 10, weight: "105kg" },
-      { series: 3, reps: 8, weight: "110kg" },
-    ],
-  },
-  {
-    date: "12/01/2026",
-    sets: [
-      { series: 1, reps: 12, weight: "95kg" },
-      { series: 2, reps: 12, weight: "95kg" },
-      { series: 3, reps: 12, weight: "95kg" },
-    ],
-  },
-  {
-    date: "10/01/2026",
-    sets: [
-      { series: 1, reps: 15, weight: "90kg" },
-      { series: 2, reps: 12, weight: "95kg" },
-      { series: 3, reps: 10, weight: "100kg" },
-    ],
-  },
-];
-
 export function ExerciseItem({
+  workoutSessionId,
   name,
   sets,
   reps,
   weight,
   restTime,
   completedSets,
+  exerciseId,
   onComplete,
   onWeightChange,
   onRestTimeChange,
 }: ExerciseItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(2);
+  const [history, setHistory] = useState<ExerciseHistory | null>(null);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
   const isCompleted = completedSets >= sets;
-  const progress = (completedSets / sets) * 100;
+  const progress = sets > 0 ? (completedSets / sets) * 100 : 0;
+  const canCompleteSet = Boolean(workoutSessionId);
+
+  const handleCompleteSet = async () => {
+    if (!workoutSessionId) return;
+
+    try {
+      await workoutPlanService.addSetToSession(workoutSessionId, {
+        workout_exercise_id: exerciseId,
+        set_number: completedSets + 1,
+        reps,
+        weight,
+        rest_seconds: restTime,
+      });
+
+      onComplete();
+    } catch (error) {
+      console.error("[ExerciseItem] Erro ao concluir série:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!isExpanded || history || loadingHistory) return;
+
+    async function loadHistory() {
+      try {
+        setLoadingHistory(true);
+        const data = await workoutPlanService.getExerciseHistory(exerciseId);
+        setHistory(data?.[0] ?? null);
+      } catch (err) {
+        console.error("[ExerciseItem] erro ao carregar histórico", err);
+      } finally {
+        setLoadingHistory(false);
+      }
+    }
+
+    loadHistory();
+  }, [exerciseId, isExpanded, history, loadingHistory]);
 
   return (
     <div
@@ -77,16 +85,15 @@ export function ExerciseItem({
       )}
     >
       <div
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => setIsExpanded((prev) => !prev)}
         className="cursor-pointer"
       >
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-lg text-muted-foreground mb-2 block">
-            {name}
-          </h4>
+          <h4 className="text-lg text-muted-foreground">{name}</h4>
+
           <div
             className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+              "w-8 h-8 rounded-full flex items-center justify-center",
               isCompleted
                 ? "bg-success text-success-foreground"
                 : "bg-secondary text-muted-foreground"
@@ -112,7 +119,7 @@ export function ExerciseItem({
 
         <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
           <div
-            className="h-full gradient-primary transition-all duration-500"
+            className="h-full gradient-primary transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -172,53 +179,57 @@ export function ExerciseItem({
             <Button
               variant="gradient"
               className="w-full"
-              onClick={(e) => {
-                e.stopPropagation();
-                onComplete();
-              }}
+              disabled={!canCompleteSet}
+              onClick={handleCompleteSet}
             >
               <Check className="w-4 h-4 mr-2" />
-              Concluir Série {completedSets + 1}
+              {canCompleteSet
+                ? `Concluir Série ${completedSets + 1}`
+                : "Inicie o treino para registrar séries"}
             </Button>
           )}
-        </div>
-      )}
-      {isExpanded && (
-        <div className="mt-4">
-          <label className="text-s text-muted-foreground mb-2 block">
-            Histórico de exercícios
-          </label>
-          <ul style={{ listStyle: "none" }}>
-            {MOCK_HISTORY.slice(0, visibleHistoryCount).map((session, sessionIndex) => (
-              <li key={sessionIndex} className="flex flex-col gap-2 text-xs mb-4">
-                <div className="font-semibold text-muted-foreground">
-                  Data: {session.date}
-                </div>
-                <div className="pl-2 flex flex-col gap-2">
-                  {session.sets.map((set, setIndex) => (
-                    <div key={setIndex} className="flex gap-3 text-muted-foreground">
-                      <span className="w-16">Série: {set.series}</span>
-                      <span className="w-16">Reps: {set.reps}</span>
-                      <span className="w-20">Carga: {set.weight}</span>
-                    </div>
+
+          {history?.history?.length > 0 && (
+            <div className="mt-4">
+              <label className="text-sm text-muted-foreground mb-2 block">
+                Histórico de exercícios
+              </label>
+
+              <ul className="space-y-4">
+                {history.history
+                  .slice(0, visibleHistoryCount)
+                  .map((session, idx) => (
+                    <li key={idx} className="text-xs">
+                      <div className="font-semibold text-muted-foreground mb-2">
+                        Data: {session.date}
+                      </div>
+
+                      <div className="pl-2 space-y-1">
+                        {session.sets.map((set) => (
+                          <div key={set.set} className="flex gap-4">
+                            <span className="text-muted-foreground">Série: {set.set}</span>
+                            <span className="text-muted-foreground">Reps: {set.reps}</span>
+                            <span className="text-muted-foreground">Carga: {set.weight}kg</span>
+                          </div>
+                        ))}
+                      </div>
+                    </li>
                   ))}
-                </div>
-                {sessionIndex <
-                  Math.min(visibleHistoryCount, MOCK_HISTORY.length) - 1 && (
-                    <hr className="mt-2 text-border" />
-                  )}
-              </li>
-            ))}
-          </ul>
-          {visibleHistoryCount < MOCK_HISTORY.length && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full mt-2 text-primary"
-              onClick={() => setVisibleHistoryCount((prev) => prev + 2)}
-            >
-              Ver mais histórico
-            </Button>
+              </ul>
+
+              {visibleHistoryCount < history.history.length && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full mt-2 text-primary"
+                  onClick={() =>
+                    setVisibleHistoryCount((prev) => prev + 2)
+                  }
+                >
+                  Ver mais histórico
+                </Button>
+              )}
+            </div>
           )}
         </div>
       )}

@@ -51,8 +51,6 @@ export class ProfileService {
 
 		const url = `${this.baseUrl}/profiles/me`;
 
-		console.debug('ProfileService.Get calling URL:', url, 'hasToken=', !!token);
-
 		try {
 			const res = await fetch(url, {
 				method: 'GET',
@@ -158,6 +156,74 @@ export class ProfileService {
 			);
 		}
 	}
+
+	public async dataProfile(options?: { waitForToken?: boolean; timeoutMs?: number }) {
+		const { waitForToken = true, timeoutMs = 1000 } = options ?? {};
+		let token = await this.getToken();
+
+		if (!token && waitForToken) {
+			const start = Date.now();
+			const interval = 150;
+			while (!token && Date.now() - start < timeoutMs) {
+				await new Promise((r) => setTimeout(r, interval));
+				token = await this.getToken();
+			}
+		}
+
+		if (!token) {
+			console.debug('ProfileService.Get: no token available, skipping API call');
+			return null;
+		}
+
+		const url = `${this.baseUrl}/profiles/profile/info`;
+
+		try {
+			const res = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(
+					`Request to ${url} failed: ${res.status} ${res.statusText} - ${body}`,
+				);
+			}
+
+			const text = await res.text();
+			if (!text) {
+				return null;
+			}
+
+			return JSON.parse(text) as Profile;
+		} catch (err: any) {
+			console.error('ProfileService.Get fetch error', err);
+			throw new Error(
+				`Network request failed to ${url}: ${err?.message ?? String(err)}`,
+			);
+		}
+	}
+
+	// Atualizações diretas via Supabase (Storage / Postgres)
+	// Não passam pela API externa
+	public async updateAvatarUrl(
+		userId: string,
+		avatarUrl: string
+	): Promise<void> {
+		const { error } = await supabase
+			.from("profile_fitness_data")
+			.update({ avatar_url: avatarUrl })
+			.eq("user_id", userId);
+
+		if (error) {
+			console.error("ProfileService.updateAvatarUrl error", error);
+			throw error;
+		}
+	}
+
 }
 
 export const profileService = new ProfileService();
