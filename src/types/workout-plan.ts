@@ -36,4 +36,9 @@ export interface WorkoutPlanResponse {
     rating_average: number | null;
     ratings_count: number;
     workout_exercises: WorkoutExercise[]; 
+    muscle_groups: string[];
+    goals: string[];
 }
+
+
+

@@ -13,15 +13,6 @@ export interface WorkoutSession {
   finished_at: string | null;
 }
 
-export interface WorkoutExercise {
-  id?: string;
-  name: string;
-  sets: number;
-  reps: number;
-  weight: number;
-  restTimeSeconds: number;
-}
-
 type ActiveWorkoutSession = {
   sessionId: string;
   startedAt: string;
@@ -52,18 +43,38 @@ export interface ExerciseHistory {
   }[];
 }
 
-
-
-export interface WorkoutPlan {
-  map: any;
+export interface WorkoutExercise {
+  created_at: string;
   id: string;
   name: string;
-  isPublic: boolean;
-  createdAt: string;
-  exercises?: WorkoutExercise[];
-  likesCount?: number;
-  rating_average?: number | null;
-  ratings_count?: number;
+  reps: number;
+  rest_time_seconds: number;
+  sets: number;
+  updated_at: string;
+  weight: number;
+  workout_plan_id: string;
+}
+
+export interface WorkoutPlan {
+  calories: number | null;
+  created_at: string;
+  estimated_duration_minutes: number;
+  goals: string[];
+  id: string;
+  is_favorite: boolean;
+  is_favorited: boolean;
+  is_liked: boolean;
+  is_public: boolean;
+  likes_count: number;
+  muscle_groups: string[];
+  name: string;
+  rating_average: number | null;
+  ratings_count: number;
+  source_plan_id: string | null;
+  training_time: number;
+  updated_at: string;
+  user_id: string;
+  workout_exercises: WorkoutExercise[];
 }
 
 export interface ExerciseByIdResponse {
@@ -188,7 +199,6 @@ export class WorkoutPlanService {
     );
   }
 
-
   public async addExercise(
     planId: string,
     payload: WorkoutExercise,
@@ -308,7 +318,21 @@ export class WorkoutPlanService {
     );
   }
 
+  public async getGoalsTag(): Promise<string[]> {
+    return this.authFetch<string[]>(
+      `${this.baseUrl}/workout-plans/tags/goals`,
+      undefined,
+      false
+    )
+  }
 
+  public async getMuscleGroupsTag(): Promise<string[]> {
+    return this.authFetch<string[]>(
+      `${this.baseUrl}/workout-plans/tags/muscle-groups`,
+      undefined,
+      false
+    )
+  }
 }
 
 export const workoutPlanService = new WorkoutPlanService();

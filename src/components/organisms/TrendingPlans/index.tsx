@@ -13,7 +13,10 @@ export function TrendingPlans({
     calories,
     ratings_count,
     workout_exercises,
-    is_liked
+    is_liked,
+    is_public,
+    muscle_groups,
+    goals
 }: WorkoutPlanResponse) {
     const [isLiked, setIsLiked] = useState(is_liked ?? false);
     const handleLike = (e: React.MouseEvent) => {
@@ -34,9 +37,13 @@ export function TrendingPlans({
             id={`trending-plan-${id}`}
         >
             <div className="pl-3 flex gap-2">
-                <Chip label="Publico" />
-                <Chip label="Hipertrofia" />
-                <Chip label="Emagrecimento" />
+                <Chip label="Publico" selected={!!is_public} />
+                {goals?.map((goal, index) => (
+                    <Chip key={index} label={goal} selected={true} />
+                ))}
+                {muscle_groups?.map((group, index) => (
+                    <Chip key={index} label={group} selected={true} />
+                ))}
             </div>
             <div className="flex items-center justify-between p-4">
                 <div className="flex flex-col gap-2">
@@ -64,7 +71,7 @@ export function TrendingPlans({
                     </button>
                     <label
                         className="text-xs text-muted-foreground"
-                    >{likes_count}</label>
+                    >{isLiked ? likes_count + 1 : likes_count}</label>
                 </div>
             </div>
 

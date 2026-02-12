@@ -3,6 +3,7 @@ interface ChipProps {
     selected?: boolean;
     view?: boolean;
     onClick?: () => void;
+    customBackgroundColor?: string;
 }
 
 function Chip({
@@ -10,6 +11,7 @@ function Chip({
     selected,
     view = false,
     onClick,
+    customBackgroundColor
 }: ChipProps) {
     return (
         <div
@@ -18,8 +20,8 @@ function Chip({
                 padding: '4px 8px',
                 borderRadius: '16px',
                 marginTop: '8px',
-                backgroundColor: selected || view ? '#7c3aed' : '#202126',
-                color: selected || view ? 'white' : '#fff9f9',
+                backgroundColor: customBackgroundColor ? customBackgroundColor : selected || view ? '#7c3aed' : '#202126',
+                color: customBackgroundColor ? 'white' : selected || view ? 'white' : '#fff9f9',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 fontSize: '12px',
