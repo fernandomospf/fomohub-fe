@@ -1,5 +1,5 @@
 import { ApiRequest } from "../api";
-import { ActiveWorkoutSession, ExerciseByIdResponse, ExerciseHistory, WorkoutExercise, WorkoutPlan, WorkoutSession } from "./type";
+import { ActiveWorkoutSession, ExerciseByIdResponse, ExerciseHistory, WorkoutExercise, WorkoutPlan, WorkoutSession } from "./types";
 
 export class WorkoutPlanService {
   constructor(private api: ApiRequest) { }

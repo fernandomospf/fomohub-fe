@@ -6,10 +6,10 @@ import { WorkoutCard } from "@/components/organisms/workout/WorkoutCard";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import Link from "next/link";
-import workoutPlanService from "@/api/WorkoutPlan/workout-plan";
 import { Loading } from "@/components/atoms/Loading";
 import { EmptyState } from "@/components/atoms/empty-state";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/atoms/tabs";
+import { workoutPlanService } from "@/infra/container";
 
 export default function Workouts() {
   const [searchQuery, setSearchQuery] = useState("");

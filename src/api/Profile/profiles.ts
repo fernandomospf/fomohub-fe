@@ -1,7 +1,7 @@
 import { UserData } from '../../types/user';
 import { supabase } from '../../lib/supabase';
 import { ApiRequest } from '../api';
-import { OnboardingPayload } from './type';
+import { OnboardingPayload } from './types';
 
 export type Profile = UserData;
 

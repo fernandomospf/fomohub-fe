@@ -27,7 +27,7 @@ import { TrendingPlans } from "@/components/organisms/TrendingPlans";
 import { UserData } from "@/types/user";
 import { Onboarding } from "./Onboarding";
 import { Input } from "@/components/atoms/input";
-import { WorkoutPlan } from "@/api/WorkoutPlan/type";
+import { WorkoutPlan } from "@/api/WorkoutPlan/types";
 
 const stats = [
   {

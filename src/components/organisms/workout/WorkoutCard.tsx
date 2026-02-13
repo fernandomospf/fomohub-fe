@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 import Chip from "@/components/atoms/Chip";
+import { workoutPlanService } from "@/infra/container";
 import { WorkoutCardProps } from "./type";
-import workoutPlanService from "@/api/WorkoutPlan/workout-plan";
 
 export function WorkoutCard({
   id,
