@@ -101,7 +101,7 @@ export class ApiRequest {
     ...headers,
   };
 
-  const url = `${this.baseUrl}/${endpoint}`;
+  const url = `${this.baseUrl}${endpoint}`;
 
   const res = await fetch(url, {
     method,
