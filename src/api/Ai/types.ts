@@ -1,8 +1,7 @@
 export interface GenerateWorkoutRequest {
-  age: number;    
   goal: string;   
-  level: string;  
   time: number;   
+  muscles: string[];
 }
 
 export interface Exercise {
@@ -16,4 +15,13 @@ export interface GenerateWorkoutResponse {
   name: string;           
   duration: number;       
   exercises: Exercise[];  
+}
+
+export interface RemainingCreditsResponse {
+  status: string;
+  credits: number;
+}
+
+export interface GeneratedWorkoutResponse {
+  id: string;
 }
