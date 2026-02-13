@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/templates/PageHeader";
 import { ExerciseItem } from "@/components/organisms/workout/ExerciseItem";
 import { RestTimer } from "@/components/organisms/workout/RestTimer";
 import { Button } from "@/components/atoms/button";
-import workoutPlanService from "@/api/workout-plan";
+import workoutPlanService from "@/api/WorkoutPlan/workout-plan";
 import { Exercise } from "@/types/exercise";
 import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
 import { Loading } from "@/components/atoms/Loading";

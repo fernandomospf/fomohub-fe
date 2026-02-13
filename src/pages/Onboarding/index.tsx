@@ -22,7 +22,7 @@ import { Input } from "@/components/atoms/input";
 import { Label } from "@/components/atoms/label";
 import { RadioGroup, RadioGroupItem } from "@/components/atoms/radio-group";
 import { Progress } from "@/components/atoms/progress";
-import profileService from "@/api/profiles";
+import { profileService } from "@/infra/container";
 
 const objectives = [
     { value: "emagrecer", label: "Emagrecer", description: "Perder gordura corporal" },
@@ -143,7 +143,7 @@ export function Onboarding() {
 
         const hasYes = data.parqAnswers.some((a: boolean) => a === true);
 
-        await profileService.CompletedOnboarding({
+        await profileService.completedOnboarding({
             fitnessData: {
                 socialName: data.name,
                 birthDate: data.birthDate,

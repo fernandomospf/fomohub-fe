@@ -3,7 +3,7 @@ import { WorkoutPlanResponse } from "@/types/workout-plan";
 import { Star, Heart, Flame, Clock } from 'lucide-react';
 import { useState } from "react";
 import Chip from "@/components/atoms/Chip";
-import workoutPlanService from "@/api/workout-plan";
+import { workoutPlanService } from "@/infra/container";
 import { toast } from "sonner";
 
 export function TrendingPlans({

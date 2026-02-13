@@ -18,16 +18,16 @@ import { useEffect, useState } from "react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader";
 import { Button } from "@/components/atoms/button";
-import profileService from "@/api/profiles";
+import { profileService, workoutPlanService } from "@/infra/container";
 import { useSession } from "@/hooks/useSession";
 import { useRouter } from "next/router";
 import { Loading } from "@/components/atoms/Loading";
 import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
-import workoutPlanService, { WorkoutPlan } from "@/api/workout-plan";
 import { TrendingPlans } from "@/components/organisms/TrendingPlans";
 import { UserData } from "@/types/user";
 import { Onboarding } from "./Onboarding";
 import { Input } from "@/components/atoms/input";
+import { WorkoutPlan } from "@/api/WorkoutPlan/type";
 
 const stats = [
   {
@@ -163,9 +163,7 @@ export default function Index() {
         setLoading(true);
         setError(null);
 
-        const profile = await profileService.Get({
-          waitForToken: false,
-        });
+       const profile = await profileService.get();
 
         if (!mounted) return;
         setUserData(profile);

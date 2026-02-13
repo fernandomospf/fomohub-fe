@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import Chip from "@/components/atoms/Chip";
 import { WorkoutCardProps } from "./type";
-import workoutPlanService from "@/api/workout-plan";
+import workoutPlanService from "@/api/WorkoutPlan/workout-plan";
 
 export function WorkoutCard({
   id,

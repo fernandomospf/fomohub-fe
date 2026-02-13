@@ -6,7 +6,7 @@ import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
-import workoutPlanService from "@/api/workout-plan";
+import workoutPlanService from "@/api/WorkoutPlan/workout-plan";
 import { toast } from "@/hooks/use-toast";
 import { Switch } from "@/components/atoms/switch";
 import Chip from "@/components/atoms/Chip";
