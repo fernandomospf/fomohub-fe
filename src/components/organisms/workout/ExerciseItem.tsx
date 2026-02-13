@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Check, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/atoms/button";
 import { cn } from "@/lib/utils";
-import workoutPlanService, { ExerciseHistory } from "@/api/WorkoutPlan/workout-plan";
+import { workoutPlanService } from "@/infra/container";
+import { ExerciseHistory } from "@/api/WorkoutPlan/types";
 
 interface ExerciseItemProps {
   id: string;

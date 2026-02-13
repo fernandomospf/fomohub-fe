@@ -6,7 +6,6 @@ import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
-import workoutPlanService from "@/api/WorkoutPlan/workout-plan";
 import { toast } from "@/hooks/use-toast";
 import { Switch } from "@/components/atoms/switch";
 import Chip from "@/components/atoms/Chip";
@@ -16,6 +15,7 @@ import { FormWithExercises } from "@/components/organisms/TrainingCardCreate/typ
 import styles from "./NewWorkout.module.css";
 import { useTranslate } from "@/hooks/useTranslate";
 import { SectionWorkoutExercise } from "./fragments/SectionWorkoutExercise";
+import { workoutPlanService } from "@/infra/container";
 
 export default function NewWorkout() {
   const router = useRouter();
