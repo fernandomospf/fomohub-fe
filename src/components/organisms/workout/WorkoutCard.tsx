@@ -16,10 +16,12 @@ export function WorkoutCard({
   is_favorited,
   is_liked,
   imageUrl,
+  is_public,
   onFavorite,
 }: WorkoutCardProps) {
   const [isLiked, setIsLiked] = useState<boolean>(is_liked ?? false);
   const [isFavorite, setIsFavorite] = useState<boolean>(is_favorited ?? false);
+  const [isPublic, setIsPublic] = useState<boolean>(is_public ?? false);
 
   const handleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -52,6 +54,24 @@ export function WorkoutCard({
       toast.error("Erro ao curtir treino");
     }
   };
+
+const handleTogglePublic = async () => {
+  try {
+    if(isPublic){
+      await workoutPlanService.turnPrivate(id);
+      setIsPublic(false);
+      toast.success("Treino tornado privado");
+    }else{
+      await workoutPlanService.turnPublic(id);
+      setIsPublic(true);
+      toast.success("Treino tornado público");
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Erro ao atualizar treino");
+  }
+};
+
 
   const CHIP_CATEGORY = muscle_groups ? [...muscle_groups] : [];
   return (
@@ -91,37 +111,84 @@ export function WorkoutCard({
               <Chip label="..." view={false} />
             )}
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={handleFavorite}
-              className={cn(
-                "p-2 rounded-full transition-all",
-                isFavorite
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              )}
-            >
-              <Bookmark
+          <div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleFavorite}
                 className={cn(
-                  "w-5 h-5 transition-all",
-                  isFavorite && "fill-current"
+                  "p-2 rounded-full transition-all",
+                  isFavorite
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                 )}
-              />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleLike(e);
-              }}
-              className={cn(
-                "p-2 rounded-full transition-all",
-                isLiked
-                  ? "text-red-500"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              )}
-            >
-              <Heart className={cn("w-5 h-5", isLiked && "fill-current")} />
-            </button>
+              >
+                <Bookmark
+                  className={cn(
+                    "w-5 h-5 transition-all",
+                    isFavorite && "fill-current"
+                  )}
+                />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLike(e);
+                }}
+                className={cn(
+                  "p-2 rounded-full transition-all",
+                  isLiked
+                    ? "text-red-500"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                )}
+              >
+                <Heart className={cn("w-5 h-5", isLiked && "fill-current")} />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className="text-xs text-muted-foreground"
+                style={{
+                  color: isPublic ? '#4CAF50' : '#9E9E9E',
+                  transition: 'color 0.3s ease',
+                }}
+              >
+                {isPublic ? 'Público' : 'Privado'}
+              </span>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleTogglePublic();
+                }}
+                style={{
+                  border: '1px solid #9E9E9E',
+                  borderRadius: '10px',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: '40px',
+                  height: '20px',
+                  position: 'relative',
+                  transition: 'background-color 0.3s ease',
+                }}
+              >
+                <div
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: isPublic ? '#4CAF50' : '#9E9E9E',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '4px',
+                    transform: isPublic
+                      ? 'translateX(0) translateY(-50%)'
+                      : 'translateX(20px) translateY(-50%)',
+                    transition: 'transform 0.5s ease, background-color 0.3s ease',
+                  }}
+                />
+              </button>
+            </div>
           </div>
         </div>
 

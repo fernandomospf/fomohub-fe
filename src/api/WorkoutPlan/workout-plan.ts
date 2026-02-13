@@ -130,4 +130,20 @@ export class WorkoutPlanService {
       'workout-plans/tags/muscle-groups',
     );
   }
+
+  public async turnPublic(planId: string) {
+    return this.api.patch(
+      `workout-plans/${planId}/public`, {
+        isPublic: true
+      }
+    )
+  }
+
+  public async turnPrivate(planId: string) {
+    return this.api.patch(
+      `workout-plans/${planId}/private`, {
+        isPublic: false
+      }
+    )
+  }
 }

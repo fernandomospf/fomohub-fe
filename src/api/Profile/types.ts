@@ -25,3 +25,7 @@ export type OnboardingPayload = {
 			version: string;
 		};
 	}
+
+export type OffensiveDaysResponse = {
+	offensiveDays: number;
+}

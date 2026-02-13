@@ -29,30 +29,6 @@ import { Onboarding } from "./Onboarding";
 import { Input } from "@/components/atoms/input";
 import { WorkoutPlan } from "@/api/WorkoutPlan/types";
 
-const stats = [
-  {
-    icon: Flame,
-    label: "Streak",
-    value: "12",
-    unit: "dias",
-    color: "text-orange-500",
-  },
-  {
-    icon: Trophy,
-    label: "Ranking",
-    value: "#3",
-    unit: "posição",
-    color: "text-yellow-500",
-  },
-  {
-    icon: TrendingUp,
-    label: "Progresso",
-    value: "+15%",
-    unit: "mês",
-    color: "text-success",
-  },
-];
-
 export default function Index() {
   const router = useRouter();
   const { session, loading: sessionLoading } = useSession();
@@ -67,6 +43,7 @@ export default function Index() {
   const [visibleCount, setVisibleCount] = useState(2);
   const [startIndex, setStartIndex] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const [offensiveDays, setOffensiveDays] = useState(0);
   const [filters, setFilters] = useState<{
     tags: string[];
     search: string;
@@ -76,16 +53,34 @@ export default function Index() {
   });
 
   const stats = [
-    { icon: Flame, label: "Streak", value: "12", unit: "dias", color: "text-orange-500" },
-    { icon: Trophy, label: "Ranking", value: "#3", unit: "posição", color: "text-yellow-500" },
-    { icon: TrendingUp, label: "Progresso", value: "+15%", unit: "mês", color: "text-success" },
+    {
+      icon: Flame,
+      label: "Streak",
+      value: offensiveDays,
+      unit: "dias",
+      color: "text-orange-500",
+    },
+    {
+      icon: Trophy,
+      label: "Ranking",
+      value: "#3",
+      unit: "posição",
+      color: "text-yellow-500",
+    },
+    {
+      icon: TrendingUp,
+      label: "Progresso",
+      value: "+15%",
+      unit: "mês",
+      color: "text-success",
+    },
   ];
 
   const quickActions = [
     { icon: Sparkles, label: "Treino IA", path: "/ai-workout", gradient: true },
-    { icon: Users, label: "Profissionais", path: "/professionals", gradient: false },
+    // { icon: Users, label: "Profissionais", path: "/professionals", gradient: false },
     { icon: Trophy, label: "Ranking", path: "/ranking", gradient: false },
-    { icon: ShoppingBag, label: "Loja", path: "/marketplace", gradient: false },
+    // { icon: ShoppingBag, label: "Loja", path: "/marketplace", gradient: false },
   ];
 
 
@@ -144,6 +139,10 @@ export default function Index() {
 
     const fetchWorkoutPlan = async () => {
       try {
+        const { offensiveDays } = await profileService.offensiveDays();
+        setOffensiveDays(offensiveDays);
+
+
         const response = await workoutPlanService.getWorkoutPlanPublic();
         setWorkoutPlan(response || []);
       } catch (err) {
@@ -163,7 +162,7 @@ export default function Index() {
         setLoading(true);
         setError(null);
 
-       const profile = await profileService.get();
+        const profile = await profileService.get();
 
         if (!mounted) return;
         setUserData(profile);
@@ -229,6 +228,7 @@ export default function Index() {
 
   const canPaginate = filteredPlans.length > 2;
   const hasMore = visibleCount < filteredPlans.length;
+
 
   return (
     <MobileLayout>

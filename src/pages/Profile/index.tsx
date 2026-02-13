@@ -317,7 +317,7 @@
 
                   <ProgressCard
                     label="Peso Atual"
-                    value={`${profile?.measurements.weight_kg || 0}`}
+                    value={`${profile?.measurements?.weight_kg || 0}`}
                     unit="kg"
                     // change={profile?.weight_kg || 0}
                     icon={<Scale className="w-4 h-4 text-primary-foreground" />}
