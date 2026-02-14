@@ -52,8 +52,8 @@ export function BottomNav() {
   const overflowItems = navItems.slice(visibleCount);
 
   const isActivePath = (path: string) => {
-    if (path === "/") return pathname === "/";
-    return pathname.startsWith(path);
+    if (typeof pathname !== "string") return false;
+    return path === "/" ? pathname === "/" : pathname.startsWith(path);
   };
 
   return (
