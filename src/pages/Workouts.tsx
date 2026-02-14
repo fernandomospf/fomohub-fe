@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dumbbell, Plus, Search } from "lucide-react";
+import { Dumbbell, Plus, Search, Sparkles } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader";
 import { WorkoutCard } from "@/components/organisms/workout/WorkoutCard";
@@ -113,19 +113,34 @@ export default function Workouts() {
             />
           </div>
 
-          <Link href="/workouts/new">
-            <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
-              <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
-                <Plus className="w-6 h-6 text-primary-foreground" />
+          <div className="flex flex-col gap-2">
+            <Link href="/workouts/new">
+              <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
+                  <Plus className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="font-semibold">Criar novo plano de treino</p>
+                  <p className="text-sm text-muted-foreground">
+                    Monte seu treino personalizado
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold">Criar novo plano de treino</p>
-                <p className="text-sm text-muted-foreground">
-                  Monte seu treino personalizado
-                </p>
+            </Link>
+             <Link href="/ai-workout">
+              <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="font-semibold">EvoluIA</p>
+                  <p className="text-sm text-muted-foreground">
+                    Monte seu treino exclusivo com IA
+                  </p>
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-3">

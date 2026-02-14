@@ -29,3 +29,26 @@ export type OnboardingPayload = {
 export type OffensiveDaysResponse = {
 	offensiveDays: number;
 }
+
+export type LastTrainingResponse = {
+	lastTraining: {
+		finished_at: string;
+		workout_plan: {
+			id: string;
+			user_id: string;
+			name: string;
+			is_public: boolean;
+			is_favorite: boolean;
+			created_at: string;
+			updated_at: string;
+			likes_count: number;
+			rating_average: number | null;
+			ratings_count: number;
+			source_plan_id: string | null;
+			muscle_groups: string[];
+			goals: string[];
+			training_time: number;
+			workout_type: string;
+		}
+	}
+}

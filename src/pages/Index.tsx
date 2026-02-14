@@ -77,7 +77,7 @@ export default function Index() {
   ];
 
   const quickActions = [
-    { icon: Sparkles, label: "Treino IA", path: "/ai-workout", gradient: true },
+    { icon: Sparkles, label: "EvoluIA", path: "/ai-workout", gradient: true },
     // { icon: Users, label: "Profissionais", path: "/professionals", gradient: false },
     { icon: Trophy, label: "Ranking", path: "/ranking", gradient: false },
     // { icon: ShoppingBag, label: "Loja", path: "/marketplace", gradient: false },

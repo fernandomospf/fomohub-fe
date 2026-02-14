@@ -1,7 +1,7 @@
 import { UserData } from '../../types/user';
 import { supabase } from '../../lib/supabase';
 import { ApiRequest } from '../api';
-import { OffensiveDaysResponse, OnboardingPayload } from './types';
+import { OffensiveDaysResponse, OnboardingPayload, LastTrainingResponse } from './types';
 
 export type Profile = UserData;
 
@@ -33,6 +33,14 @@ export class ProfileService {
 
 	public async offensiveDays(): Promise<OffensiveDaysResponse> {
 		return this.api.get<OffensiveDaysResponse>('profiles/offensive-days');
+	}
+
+	public async countTraining(): Promise<{ trainingCount: number }> {
+		return this.api.get<{ trainingCount: number }>('profiles/training-count');
+	}
+
+	public async lastTraining(): Promise<LastTrainingResponse> {
+		return this.api.get<LastTrainingResponse>('profiles/last-training');
 	}
 }
 
