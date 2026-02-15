@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 
 const navItems = [
   { icon: Home, label: "Feed", path: "/" },
@@ -27,7 +27,8 @@ const navItems = [
 ];
 
 export function BottomNav() {
-  const pathname = usePathname();
+  const router = useRouter();
+  const pathname = router.pathname;
   const [showMore, setShowMore] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
 

@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { BottomNav } from "./BottomNav";
 
 interface MobileLayoutProps {
@@ -8,8 +9,8 @@ interface MobileLayoutProps {
 
 export function MobileLayout({ children, hideNav, className="" }: MobileLayoutProps) {
   return (
-    <div className={`min-h-[100dvh] h-[100dvh] overflow-hidden flex flex-col ${className}`}>
-      <main className={hideNav ? "" : "pb-24"}>
+    <div className={`min-h-[100dvh] h-[100dvh] flex flex-col ${className}`}>
+      <main className={cn("flex-1 overflow-y-auto", hideNav ? "" : "pb-24")}>
         {children}
       </main>
       {!hideNav && <BottomNav />}
