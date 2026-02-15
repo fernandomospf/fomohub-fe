@@ -213,7 +213,7 @@ export default function Index() {
   if (error) {
     return (
       <MobileLayout>
-        <PageHeader title="Fomo" />
+        <PageHeader />
         <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
           <p className="text-destructive">{error}</p>
           <Button onClick={() => window.location.reload()}>
@@ -232,7 +232,7 @@ export default function Index() {
 
   return (
     <MobileLayout>
-      <PageHeader title="Fomo" showSettings />
+      <PageHeader showSettings />
       {userData?.onboarding_completed ? (
         <>
           <div className="px-4 py-6 space-y-6">

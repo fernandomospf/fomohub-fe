@@ -1,4 +1,4 @@
-import { ArrowLeft, Settings } from "lucide-react";
+import { ArrowLeft, Settings, MessagesSquare } from "lucide-react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/atoms/button";
 import Image from "next/image";
@@ -12,7 +12,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title = "", showBack, showSettings, rightElement }: PageHeaderProps) {
   const router = useRouter();
-
+//  { icon: MessagesSquare, label: "Chat", path: "/DirectMessages" }
   return (
     <header className="sticky top-0 z-40 glass-strong safe-top">
       <div className="flex items-center justify-between h-16 px-4">
@@ -32,7 +32,7 @@ export function PageHeader({ title = "", showBack, showSettings, rightElement }:
         </div>
         <div className="flex items-center gap-2">
           {rightElement}
-          {showSettings && (
+          {/* {showSettings && (
             <Button
               variant="ghost"
               size="icon-sm"
@@ -41,7 +41,14 @@ export function PageHeader({ title = "", showBack, showSettings, rightElement }:
             >
               <Settings className="w-5 h-5" />
             </Button>
-          )}
+          )} */}
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/DirectMessages")}
+            className="rounded-full"
+          >
+            <MessagesSquare className="w-16 h-16" />
+          </Button>
         </div>
       </div>
     </header>

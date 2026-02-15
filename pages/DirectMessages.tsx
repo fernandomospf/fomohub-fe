@@ -74,7 +74,7 @@ export default function Chat() {
 
   return (
     <MobileLayout className="h-[100dvh] overflow-hidden">
-      <PageHeader title="Chat" />
+      <PageHeader />
 
       <Tabs defaultValue="diretas" className="flex flex-col">
         <div className="px-4 pt-2 pb-3">

@@ -242,7 +242,7 @@ export default function Profile() {
   console.log(lastTraining?.lastTraining?.workout_plan?.name)
   return (
     <MobileLayout>
-      <PageHeader title="Perfil" showSettings />
+      <PageHeader showSettings />
       {
         loading ? (
           <Loading />

@@ -4,7 +4,6 @@ import {
   Home,
   Dumbbell,
   Trophy,
-  MessageCircle,
   User,
   ShoppingBag,
   Calendar,
@@ -20,10 +19,8 @@ const navItems = [
   { icon: Dumbbell, label: "Treinos", path: "/workouts" },
   // { icon: Trophy, label: "Ranking", path: "/ranking" },
   // { icon: ShoppingBag, label: "Loja", path: "/marketplace" },
-  // { icon: Calendar, label: "Eventos", path: "/events" },
+  { icon: Calendar, label: "Eventos", path: "/events" },
   { icon: User, label: "Perfil", path: "/profile" },
-  { icon: MessageCircle, label: "Chat", path: "/DirectMessages" },
-
 ];
 
 export function BottomNav() {

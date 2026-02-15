@@ -97,7 +97,7 @@ export default function Workouts() {
 
   return (
     <MobileLayout>
-      <PageHeader title="Meus Treinos" />
+      <PageHeader/>
 
       {loading ? (
         <Loading />

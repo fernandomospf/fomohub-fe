@@ -6,6 +6,7 @@ import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { cn } from "@/lib/utils";
 import { EventCard } from "@/components/organisms/events/EventCard";
+import { Router, useRouter } from "next/router";
 
 const categories = [
   { id: "all", label: "Todos", icon: Ticket },
@@ -65,7 +66,7 @@ const eventsData = [
 export default function Events() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-
+  const router = useRouter();
   const filteredEvents = eventsData.filter((event) => {
     const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
@@ -77,9 +78,8 @@ export default function Events() {
   return (
     <MobileLayout>
       <PageHeader
-        title="Eventos"
         rightElement={
-          <Button variant="gradient" size="sm">
+          <Button variant="gradient" size="sm" onClick={() => router.push("/create-event")}>
             <Plus className="w-4 h-4 mr-1" />
             Criar
           </Button>
