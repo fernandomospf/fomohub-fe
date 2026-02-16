@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Search } from "lucide-react";
+import { Plus, Search, Sparkles } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader";
 import { WorkoutCard } from "@/components/organisms/workout/WorkoutCard";
@@ -13,6 +13,7 @@ import {
   DataResponseRequest,
   WorkoutPlansResponse,
 } from "@/api/WorkoutPlan/types";
+import Image from "next/image";
 
 export default function Workouts() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -181,7 +182,6 @@ export default function Workouts() {
   return (
     <MobileLayout ref={scrollContainerRef}>
       <PageHeader />
-
       {loadingInitial ? (
         <div className="px-4 py-6 space-y-4">
           {Array.from({ length: 5 }).map((_, index) => (
@@ -198,6 +198,34 @@ export default function Workouts() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 h-12 bg-secondary border-0 rounded-xl"
             />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link href="/workouts/new">
+              <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
+                  <Plus className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="font-semibold">Criar novo plano de treino</p>
+                  <p className="text-sm text-muted-foreground">
+                    Monte seu treino personalizado
+                  </p>
+                </div>
+              </div>
+            </Link>
+            <Link href="/ai-workout">
+              <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="font-semibold">EvoluIA</p>
+                  <p className="text-sm text-muted-foreground">
+                    Monte seu treino exclusivo com IA
+                  </p>
+                </div>
+              </div>
+            </Link>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -224,20 +252,34 @@ export default function Workouts() {
 
             <TabsContent value="treinos-favoritos">
               <div className="flex flex-col gap-4">
-                {loadingTab
-                  ? Array.from({ length: 3 }).map((_, index) => (
-                      <WorkoutCardSkeleton key={index} />
-                    ))
-                  : myFavoriteWorkouts.map((workout) => (
-                      <Link key={workout.id} href={`/workouts/${workout.id}`}>
-                        <WorkoutCard {...workout} />
-                      </Link>
-                    ))}
-
-                {loadingMore &&
-                  Array.from({ length: 2 }).map((_, index) => (
+                {loadingTab ? (
+                  Array.from({ length: 3 }).map((_, index) => (
                     <WorkoutCardSkeleton key={index} />
-                  ))}
+                  ))
+                ) : myFavoriteWorkouts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-6 h-[500px] text-center">
+                    <div className="w-[180px] h-[180px] relative">
+                      <Image
+                        src="/empty_workout.png"
+                        alt="empty workout"
+                        fill
+                        className="object-contain"
+                        priority
+                      />
+                    </div>
+
+                    <p className="text-muted-foreground max-w-[260px]">
+                      Nenhum treino favorito encontrado.
+                    </p>
+                  </div>
+
+                ) : (
+                  myFavoriteWorkouts.map((workout) => (
+                    <Link key={workout.id} href={`/workouts/${workout.id}`}>
+                      <WorkoutCard {...workout} />
+                    </Link>
+                  ))
+                )}
               </div>
             </TabsContent>
 
@@ -245,13 +287,31 @@ export default function Workouts() {
               <div className="flex flex-col gap-4">
                 {loadingTab
                   ? Array.from({ length: 3 }).map((_, index) => (
-                      <WorkoutCardSkeleton key={index} />
-                    ))
-                  : myLikedWorkouts.map((workout) => (
+                    <WorkoutCardSkeleton key={index} />
+                  )) : myLikedWorkouts.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center gap-6 h-[500px] text-center">
+                      <div className="w-[180px] h-[180px] relative">
+                        <Image
+                          src="/empty_workout.png"
+                          alt="empty workout"
+                          fill
+                          className="object-contain"
+                          priority
+                        />
+                      </div>
+
+                      <p className="text-muted-foreground max-w-[260px]">
+                        Nenhum treino curtido encontrado.
+                      </p>
+                    </div>
+
+                  ) : (
+                    myLikedWorkouts.map((workout) => (
                       <Link key={workout.id} href={`/workouts/${workout.id}`}>
                         <WorkoutCard {...workout} />
                       </Link>
-                    ))}
+                    ))
+                  )}
 
                 {loadingMore &&
                   Array.from({ length: 2 }).map((_, index) => (

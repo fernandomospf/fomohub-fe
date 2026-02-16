@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Play, Clock, Flame, Check } from "lucide-react";
+import { Play, Clock, Flame, Check, Trash2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader";
@@ -10,6 +10,7 @@ import { Exercise } from "@/types/exercise";
 import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
 import { Loading } from "@/components/atoms/Loading";
 import { workoutPlanService } from "@/infra/container";
+import { WorkoutComplete } from "@/components/organisms/TrainingFinishedModal";
 
 type ExerciseState = Exercise & {
   completedSets: number;
@@ -35,6 +36,12 @@ export default function WorkoutDetail() {
   const [loading, setLoading] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [currentRestTime, setCurrentRestTime] = useState(60);
+  const [showFinishedModal, setShowFinishedModal] = useState(false);
+
+  const hasFinishedRef = useRef(false);
+  const didRestoreSessionRef = useRef(false);
+
+  const isWorkoutStarted = !!activeWorkoutId;
 
   const [workoutInfo, setWorkoutInfo] = useState<{
     id: string;
@@ -45,9 +52,6 @@ export default function WorkoutDetail() {
     goals: string[];
     is_public: boolean;
   }>();
-  const didRestoreSessionRef = useRef(false);
-  const isWorkoutStarted = !!activeWorkoutId;
-
 
   const handleRestComplete = useCallback(() => {
     setShowTimer(false);
@@ -57,6 +61,98 @@ export default function WorkoutDetail() {
     setShowTimer(false);
   }, []);
 
+  const handleWeightChange = (exerciseId: string, weight: number) => {
+    setExercises((prev) =>
+      prev.map((e) =>
+        e.exercise_id === exerciseId ? { ...e, weight } : e
+      )
+    );
+  };
+
+  const handleRestTimeChange = (exerciseId: string, restTime: number) => {
+    setExercises((prev) =>
+      prev.map((e) =>
+        e.exercise_id === exerciseId
+          ? { ...e, rest_time_seconds: restTime }
+          : e
+      )
+    );
+  };
+
+  const handleCompleteSet = (exerciseId: string) => {
+    setExercises((prev) =>
+      prev.map((e) => {
+        if (e.exercise_id !== exerciseId) return e;
+        if (e.completedSets >= e.sets) return e;
+
+        setCurrentRestTime(e.rest_time_seconds);
+        setShowTimer(true);
+
+        return {
+          ...e,
+          completedSets: e.completedSets + 1,
+        };
+      })
+    );
+  };
+
+  const handleStartWorkout = async () => {
+    if (!id) return;
+
+    try {
+      const session = await workoutPlanService.startWorkoutSession(id);
+
+      const startedAt = Date.now();
+      localStorage.setItem("workout_started_at", String(startedAt));
+      localStorage.setItem("workout_session_id", session.id);
+
+      startWorkout(session.id);
+      setElapsedSeconds(0);
+      hasFinishedRef.current = false;
+    } catch (error) {
+      console.error("Erro ao iniciar treino:", error);
+    }
+  };
+
+  const handleFinishWorkout = async () => {
+    if (!activeWorkoutId) return;
+
+    try {
+      await workoutPlanService.finishWorkoutSession(activeWorkoutId);
+
+      localStorage.removeItem("workout_started_at");
+      localStorage.removeItem("workout_session_id");
+
+      endWorkout();
+
+      if (!hasFinishedRef.current) {
+        hasFinishedRef.current = true;
+        setShowFinishedModal(true);
+      }
+    } catch (error) {
+      console.error("Erro ao finalizar treino:", error);
+    }
+  };
+
+  const totalSets = exercises.reduce((acc, e) => acc + e.sets, 0);
+  const completedSets = exercises.reduce(
+    (acc, e) => acc + e.completedSets,
+    0
+  );
+  const totalReps = exercises.reduce(
+    (acc, e) => acc + e.completedSets * e.reps,
+    0
+  );
+  const totalExercises = exercises.length;
+
+  const progress =
+    totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
+
+  const formatElapsedTime = (seconds: number) => {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -110,12 +206,12 @@ export default function WorkoutDetail() {
             }));
           }
         } catch {
-          console.warn("[WorkoutDetail] nenhuma sessão ativa");
+          console.warn("Nenhuma sessão ativa");
         }
 
         setExercises(mappedExercises);
       } catch (err) {
-        console.error("[WorkoutDetail] erro ao carregar treino:", err);
+        console.error("Erro ao carregar treino:", err);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -127,103 +223,42 @@ export default function WorkoutDetail() {
     };
   }, [id]);
 
+  useEffect(() => {
+    const startedAt = localStorage.getItem("workout_started_at");
+    const sessionId = localStorage.getItem("workout_session_id");
+
+    if (startedAt && sessionId) {
+      const diff = Math.floor((Date.now() - Number(startedAt)) / 1000);
+      setElapsedSeconds(diff);
+      startWorkout(sessionId);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isWorkoutStarted) return;
 
     const interval = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
+      const startedAt = localStorage.getItem("workout_started_at");
+      if (!startedAt) return;
+
+      const diff = Math.floor((Date.now() - Number(startedAt)) / 1000);
+      setElapsedSeconds(diff);
     }, 1000);
 
     return () => clearInterval(interval);
   }, [isWorkoutStarted]);
 
-
-  const handleWeightChange = (exerciseId: string, weight: number) => {
-    setExercises((prev) =>
-      prev.map((e) =>
-        e.exercise_id === exerciseId ? { ...e, weight } : e
-      )
-    );
-  };
-
-  const handleRestTimeChange = (exerciseId: string, restTime: number) => {
-    setExercises((prev) =>
-      prev.map((e) =>
-        e.exercise_id === exerciseId
-          ? { ...e, rest_time_seconds: restTime }
-          : e
-      )
-    );
-  };
-
-  const handleCompleteSet = (exerciseId: string) => {
-    setExercises((prev) =>
-      prev.map((e) => {
-        if (e.exercise_id !== exerciseId) return e;
-        if (e.completedSets >= e.sets) return e;
-
-        setCurrentRestTime(e.rest_time_seconds);
-        setShowTimer(true);
-
-        return {
-          ...e,
-          completedSets: e.completedSets + 1,
-        };
-      })
-    );
-  };
-
-  const handleStartWorkout = async () => {
-    if (!id) return;
-
-    try {
-      const session = await workoutPlanService.startWorkoutSession(id);
-      startWorkout(session.id);
-    } catch (error) {
-      console.error("Erro ao iniciar treino:", error);
-    }
-  };
-
-  const handleFinishWorkout = async (auto = false) => {
-    if (!activeWorkoutId) return;
-
-    try {
-      await workoutPlanService.finishWorkoutSession(activeWorkoutId);
-      endWorkout();
-
-      // router.replace(`/workout/${id}/summary?auto=${auto}`);
-    } catch (error) {
-      console.error("Erro ao finalizar treino:", error);
-    }
-  };
-
   useEffect(() => {
-    if (!isWorkoutStarted) return;
+    if (!isWorkoutStarted || hasFinishedRef.current) return;
 
-    const allCompleted = exercises.length > 0 &&
+    const allCompleted =
+      exercises.length > 0 &&
       exercises.every((e) => e.completedSets >= e.sets);
 
     if (allCompleted) {
-      handleFinishWorkout(true);
+      handleFinishWorkout();
     }
   }, [exercises, isWorkoutStarted]);
-
-
-  const totalSets = exercises.reduce((acc, e) => acc + e.sets, 0);
-  const completedSets = exercises.reduce(
-    (acc, e) => acc + e.completedSets,
-    0
-  );
-
-  const progress =
-    totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
-
-  const formatElapsedTime = (seconds: number) => {
-    const min = Math.floor(seconds / 60);
-    const sec = seconds % 60;
-    return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-  };
 
   return (
     <MobileLayout>
@@ -241,17 +276,22 @@ export default function WorkoutDetail() {
             />
           )}
 
+          {showFinishedModal && (
+            <WorkoutComplete
+              workoutName={workoutInfo?.name ?? ""}
+              totalSets={totalSets}
+              totalExercises={totalExercises}
+              duration={formatElapsedTime(elapsedSeconds)}
+              calories={workoutInfo?.calories || 0}
+              onClose={() => setShowFinishedModal(false)}
+            />
+          )}
+
           <div className="px-4 py-6 space-y-6">
             <div className="glass rounded-2xl p-5">
               <div className="flex items-center justify-between">
                 <span className="text-lg text-muted-foreground">
                   {workoutInfo?.name}
-                </span>
-
-                <span className="text-sm text-muted-foreground">
-                  {isWorkoutStarted
-                    ? formatElapsedTime(elapsedSeconds)
-                    : `${workoutInfo?.training_time} min`}
                 </span>
               </div>
 
@@ -263,6 +303,14 @@ export default function WorkoutDetail() {
                 <div className="flex items-center gap-2">
                   <Flame className="w-4 h-4 text-orange-500" />
                   {workoutInfo?.calories} kcal
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-lg text-muted-foreground">
+                    {isWorkoutStarted
+                      ? formatElapsedTime(elapsedSeconds)
+                      : `${workoutInfo?.training_time}:00`}
+                  </span>
                 </div>
               </div>
 
@@ -291,7 +339,7 @@ export default function WorkoutDetail() {
                   className="w-full"
                   size="lg"
                   variant="secondary"
-                  onClick={() => handleFinishWorkout(false)}
+                  onClick={handleFinishWorkout}
                 >
                   <Check className="w-5 h-5 mr-2" />
                   Concluir Treino
@@ -326,6 +374,11 @@ export default function WorkoutDetail() {
                 />
               ))}
             </div>
+
+            <Button variant="ghost" size="sm" className="text-destructive">
+              <Trash2 className="w-4 h-4 mr-2" />
+              Excluir
+            </Button>
           </div>
         </>
       )}
