@@ -1,5 +1,5 @@
 import { ApiRequest } from "../api";
-import { ActiveWorkoutSession, ExerciseByIdResponse, ExerciseHistory, WorkoutExercise, WorkoutPlan, WorkoutSession } from "./types";
+import { ActiveWorkoutSession, ExerciseByIdResponse, ExerciseHistory, WorkoutExercise, WorkoutPlan, WorkoutPlansResponse, WorkoutSession } from "./types";
 
 export class WorkoutPlanService {
   constructor(private api: ApiRequest) { }
@@ -59,8 +59,13 @@ export class WorkoutPlanService {
     );
   }
 
-  public async getAllMyPlans(): Promise<WorkoutPlan[]> {
-    return this.api.get<WorkoutPlan[]>('workout-plans');
+  public async getAllMyPlans({page = 1, limit = 10}: {page?: number, limit?: number}): Promise<WorkoutPlansResponse> {
+    return this.api.get<WorkoutPlansResponse>('workout-plans', {
+      params: {
+        page: page.toString(),
+        limit: limit.toString(),
+      }
+    });
   }
 
   public async getPlanById(planId: string): Promise<ExerciseByIdResponse> {

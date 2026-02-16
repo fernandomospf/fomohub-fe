@@ -4,21 +4,21 @@ import { useState } from "react";
 import { toast } from "sonner";
 import Chip from "@/components/atoms/Chip";
 import { workoutPlanService } from "@/infra/container";
-import { WorkoutCardProps } from "./type";
+import { WorkoutPlan } from "./type";
 
 export function WorkoutCard({
   id,
   name,
-  duration,
   calories,
+  duration,
+  imageUrl,
   workout_exercises,
   muscle_groups,
   is_favorited,
   is_liked,
-  imageUrl,
   is_public,
   onFavorite,
-}: WorkoutCardProps) {
+}: WorkoutPlan) {
   const [isLiked, setIsLiked] = useState<boolean>(is_liked ?? false);
   const [isFavorite, setIsFavorite] = useState<boolean>(is_favorited ?? false);
   const [isPublic, setIsPublic] = useState<boolean>(is_public ?? false);

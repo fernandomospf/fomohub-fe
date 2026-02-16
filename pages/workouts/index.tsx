@@ -1,2 +1,2 @@
-import Workouts from "../../src/pages/Workouts";
+import Workouts from "./Workouts";
 export default Workouts;

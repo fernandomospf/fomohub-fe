@@ -29,3 +29,45 @@ export interface WorkoutCardProps {
   onClick?: () => void;
   onFavorite?: () => void;
 }
+
+export type Goal = 'hipertrofia' | string;
+export type MuscleGroup = 'glúteos' | 'pernas' | string;
+
+export interface WorkoutExercise {
+  id: string;
+  workout_plan_id: string;
+
+  name: string;
+  sets: number;
+  reps: number;
+  weight: number;
+  rest_time_seconds: number;
+
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkoutPlan {
+  id: string;
+  user_id: string;
+  name: string;
+  goals: Goal[];
+  muscle_groups: MuscleGroup[];
+  training_time: number;
+  calories: number | null;
+  is_favorite: boolean;
+  is_favorited: boolean;
+  is_liked: boolean;
+  is_public: boolean;
+  likes_count: number;
+  rating_average: number | null;
+  ratings_count: number;
+  source_plan_id: string | null;
+  created_at: string;
+  updated_at: string;
+  workout_exercises: WorkoutExercise[];
+  category?: string;
+  duration?: string;
+  imageUrl?: string;
+  onFavorite?: () => void;
+}

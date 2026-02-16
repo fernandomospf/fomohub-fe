@@ -1,23 +1,113 @@
-import { useEffect, useState } from "react";
-import { Dumbbell, Plus, Search, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Dumbbell, Plus, Search } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader";
 import { WorkoutCard } from "@/components/organisms/workout/WorkoutCard";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import Link from "next/link";
-import { Loading } from "@/components/atoms/Loading";
 import { EmptyState } from "@/components/atoms/empty-state";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/atoms/tabs";
 import { workoutPlanService } from "@/infra/container";
+import { DataResponseRequest } from "@/api/WorkoutPlan/types";
+import { WorkoutPlan } from "@/types/workout-plan";
+import { WorkoutCardSkeleton } from "@/components/atoms/SkeletonWorkout";
+import { WorkoutsPageSkeleton } from "@/components/atoms/WorkoutsPageSkeleton";
 
 export default function Workouts() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [myWorkouts, setMyWorkouts] = useState<any[]>([]);
-  const [myLikedWorkouts, setMyLikedWorkouts] = useState<any[]>([]);
-  const [myFavoriteWorkouts, setMyFavoriteWorkouts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [myWorkouts, setMyWorkouts] = useState<DataResponseRequest[]>([]);
+  const [myLikedWorkouts, setMyLikedWorkouts] = useState<WorkoutPlan[]>([]);
+  const [myFavoriteWorkouts, setMyFavoriteWorkouts] = useState<WorkoutPlan[]>([]);
+
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [loadingTab, setLoadingTab] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [activeTab, setActiveTab] = useState("meus-treinos");
+
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
+  async function loadWorkouts(nextPage = 1, append = false) {
+    try {
+      if (append) setLoadingMore(true);
+      else if (nextPage === 1) setLoadingInitial(true);
+
+      const response = await workoutPlanService.getAllMyPlans({
+        page: nextPage,
+        limit: 10,
+      });
+
+      const newData = response.data;
+
+      setMyWorkouts((prev) =>
+        append ? [...prev, ...newData] : newData
+      );
+
+      setHasMore(nextPage < response.meta.lastPage);
+      setPage(nextPage);
+    } catch (err) {
+      console.error("Erro ao carregar treinos:", err);
+    } finally {
+      setLoadingInitial(false);
+      setLoadingMore(false);
+    }
+  }
+
+  useEffect(() => {
+    loadWorkouts(1, false);
+  }, []);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+
+      const reachedBottom =
+        scrollTop + clientHeight >= scrollHeight - 200;
+
+      if (reachedBottom && hasMore && !loadingMore) {
+        loadWorkouts(page + 1, true);
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [page, hasMore, loadingMore]);
+
+  useEffect(() => {
+    async function loadByTab() {
+      try {
+        setLoadingTab(true);
+
+        if (activeTab === "treinos-curtidos") {
+          const plans = await workoutPlanService.listMyLikedPlans();
+          setMyLikedWorkouts(plans || []);
+        }
+
+        if (activeTab === "treinos-favoritos") {
+          const plans = await workoutPlanService.listMyFavoritePlans();
+          setMyFavoriteWorkouts(plans || []);
+        }
+
+        if (activeTab === "meus-treinos") {
+          setPage(1);
+          setHasMore(true);
+          await loadWorkouts(1, false);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar planos:", err);
+      } finally {
+        setLoadingTab(false);
+      }
+    }
+
+    loadByTab();
+  }, [activeTab]);
 
   const filteredWorkouts = myWorkouts.filter((workout) =>
     workout.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -28,79 +118,15 @@ export default function Workouts() {
     myLikedWorkouts.length > 0 ||
     myFavoriteWorkouts.length > 0;
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadInitial() {
-      try {
-        setLoading(true);
-
-        const [plans, liked, favorites] = await Promise.all([
-          workoutPlanService.getAllMyPlans(),
-          workoutPlanService.listMyLikedPlans(),
-          workoutPlanService.listMyFavoritePlans(),
-        ]);
-
-        if (!mounted) return;
-
-        setMyWorkouts(plans);
-        setMyLikedWorkouts(liked);
-        setMyFavoriteWorkouts(favorites);
-      } catch (err) {
-        console.error("Erro ao carregar treinos:", err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
-    loadInitial();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadByTab() {
-      try {
-        setLoading(true);
-
-        if (activeTab === "meus-treinos") {
-          const plans = await workoutPlanService.getAllMyPlans();
-          if (mounted) setMyWorkouts(plans);
-        }
-
-        if (activeTab === "treinos-curtidos") {
-          const plans = await workoutPlanService.listMyLikedPlans();
-          if (mounted) setMyLikedWorkouts(plans);
-        }
-
-        if (activeTab === "treinos-favoritos") {
-          const plans = await workoutPlanService.listMyFavoritePlans();
-          if (mounted) setMyFavoriteWorkouts(plans);
-        }
-      } catch (err) {
-        console.error("Erro ao buscar planos:", err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
-    loadByTab();
-
-    return () => {
-      mounted = false;
-    };
-  }, [activeTab]);
-
   return (
-    <MobileLayout>
-      <PageHeader/>
-
-      {loading ? (
-        <Loading />
+    <MobileLayout ref={scrollContainerRef}>
+      <PageHeader />
+      {loadingInitial ? (
+        <div className="px-4 py-6 space-y-4">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <WorkoutsPageSkeleton key={`more-${index}`} />
+          ))}
+        </div>
       ) : hasWorkouts ? (
         <div className="px-4 py-6 space-y-6">
           <div className="relative mb-4">
@@ -111,35 +137,6 @@ export default function Workouts() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 h-12 bg-secondary border-0 rounded-xl"
             />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Link href="/workouts/new">
-              <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
-                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
-                  <Plus className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <div>
-                  <p className="font-semibold">Criar novo plano de treino</p>
-                  <p className="text-sm text-muted-foreground">
-                    Monte seu treino personalizado
-                  </p>
-                </div>
-              </div>
-            </Link>
-             <Link href="/ai-workout">
-              <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
-                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <div>
-                  <p className="font-semibold">EvoluIA</p>
-                  <p className="text-sm text-muted-foreground">
-                    Monte seu treino exclusivo com IA
-                  </p>
-                </div>
-              </div>
-            </Link>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -157,6 +154,11 @@ export default function Workouts() {
                   </Link>
                 ))}
 
+                {loadingMore &&
+                  Array.from({ length: 2 }).map((_, index) => (
+                    <WorkoutCardSkeleton key={`more-${index}`} />
+                  ))}
+
                 {filteredWorkouts.length === 0 && (
                   <p className="text-center text-muted-foreground py-12">
                     Nenhum treino encontrado
@@ -166,7 +168,13 @@ export default function Workouts() {
             </TabsContent>
 
             <TabsContent value="treinos-favoritos">
-              {myFavoriteWorkouts.length > 0 ? (
+              {loadingTab ? (
+                <div className="flex flex-col gap-4">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <WorkoutCardSkeleton key={index} />
+                  ))}
+                </div>
+              ) : myFavoriteWorkouts.length > 0 ? (
                 <div className="flex flex-col gap-2">
                   {myFavoriteWorkouts.map((workout) => (
                     <Link key={workout.id} href={`/workouts/${workout.id}`}>
@@ -182,7 +190,13 @@ export default function Workouts() {
             </TabsContent>
 
             <TabsContent value="treinos-curtidos">
-              {myLikedWorkouts.length > 0 ? (
+              {loadingTab ? (
+                <div className="flex flex-col gap-4">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <WorkoutCardSkeleton key={index} />
+                  ))}
+                </div>
+              ) : myLikedWorkouts.length > 0 ? (
                 <div className="flex flex-col gap-2">
                   {myLikedWorkouts.map((workout) => (
                     <Link key={workout.id} href={`/workouts/${workout.id}`}>

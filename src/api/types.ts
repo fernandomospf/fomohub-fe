@@ -8,4 +8,5 @@ export interface TokenProvider {
 export interface RequestOptions {
   headers?: Record<string, string>;
   requireAuth?: boolean;
+  params?: Record<string, string | number | boolean | undefined>;
 }
