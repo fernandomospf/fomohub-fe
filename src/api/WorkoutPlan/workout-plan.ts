@@ -161,4 +161,10 @@ export class WorkoutPlanService {
       }
     )
   }
+
+  public async deletePlan(planId: string) {
+    return this.api.delete(
+      `workout-plans/${planId}`
+    )
+  }
 }

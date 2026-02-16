@@ -14,8 +14,11 @@ import {
   WorkoutPlansResponse,
 } from "@/api/WorkoutPlan/types";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 export default function Workouts() {
+  const router = useRouter();
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const [myWorkouts, setMyWorkouts] = useState<DataResponseRequest[]>([]);
@@ -36,6 +39,23 @@ export default function Workouts() {
   const [favoriteHasMore, setFavoriteHasMore] = useState(true);
 
   const [activeTab, setActiveTab] = useState("meus-treinos");
+
+  const handleDeleteFromMyWorkouts = (id: string) => {
+    setMyWorkouts((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleDeleteFromFavorites = (id: string) => {
+    setMyFavoriteWorkouts((prev) =>
+      prev.filter((item) => item.id !== id)
+    );
+  };
+
+  const handleDeleteFromLiked = (id: string) => {
+    setMyLikedWorkouts((prev) =>
+      prev.filter((item) => item.id !== id)
+    );
+  };
+
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -237,11 +257,35 @@ export default function Workouts() {
 
             <TabsContent value="meus-treinos">
               <div className="flex flex-col gap-4">
-                {filteredWorkouts.map((workout) => (
-                  <Link key={workout.id} href={`/workouts/${workout.id}`}>
-                    <WorkoutCard {...workout} />
-                  </Link>
-                ))}
+                {filteredWorkouts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-2 h-[300px] text-center">
+                    <div className="w-[180px] h-[180px] relative">
+                      <Image
+                        src="/empty_workout.png"
+                        alt="empty workout"
+                        fill
+                        className="object-contain"
+                        priority
+                      />
+                    </div>
+
+                    <p className="text-muted-foreground max-w-[260px]">
+                      Nenhum treino encontrado.
+                    </p>
+                  </div>
+                ) : (
+                  filteredWorkouts.map((workout) => (
+                    <div
+                      key={workout.id}
+                      onClick={() => router.push(`/workouts/${workout.id}`)}
+                    >
+                      <WorkoutCard
+                        {...workout}
+                        onDelete={handleDeleteFromMyWorkouts}
+                      />
+                    </div>
+                  ))
+                )}
 
                 {loadingMore &&
                   Array.from({ length: 2 }).map((_, index) => (
@@ -249,7 +293,6 @@ export default function Workouts() {
                   ))}
               </div>
             </TabsContent>
-
             <TabsContent value="treinos-favoritos">
               <div className="flex flex-col gap-4">
                 {loadingTab ? (
@@ -257,7 +300,7 @@ export default function Workouts() {
                     <WorkoutCardSkeleton key={index} />
                   ))
                 ) : myFavoriteWorkouts.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center gap-6 h-[500px] text-center">
+                  <div className="flex flex-col items-center justify-center gap-2 h-[300px] text-center">
                     <div className="w-[180px] h-[180px] relative">
                       <Image
                         src="/empty_workout.png"
@@ -275,9 +318,12 @@ export default function Workouts() {
 
                 ) : (
                   myFavoriteWorkouts.map((workout) => (
-                    <Link key={workout.id} href={`/workouts/${workout.id}`}>
-                      <WorkoutCard {...workout} />
-                    </Link>
+                    <div key={workout.id} onClick={() => router.push(`/workouts/${workout?.id}`)}>
+                      <WorkoutCard
+                        {...workout}
+                        onDelete={handleDeleteFromFavorites}
+                      />
+                    </div>
                   ))
                 )}
               </div>
@@ -289,7 +335,7 @@ export default function Workouts() {
                   ? Array.from({ length: 3 }).map((_, index) => (
                     <WorkoutCardSkeleton key={index} />
                   )) : myLikedWorkouts.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-6 h-[500px] text-center">
+                    <div className="flex flex-col items-center justify-center gap-2 h-[300px] text-center">
                       <div className="w-[180px] h-[180px] relative">
                         <Image
                           src="/empty_workout.png"
@@ -307,9 +353,12 @@ export default function Workouts() {
 
                   ) : (
                     myLikedWorkouts.map((workout) => (
-                      <Link key={workout.id} href={`/workouts/${workout.id}`}>
-                        <WorkoutCard {...workout} />
-                      </Link>
+                      <div key={workout.id} onClick={() => router.push(`/workouts/${workout?.id}`)}>
+                        <WorkoutCard
+                          {...workout}
+                          onDelete={handleDeleteFromLiked}
+                        />
+                      </div>
                     ))
                   )}
 

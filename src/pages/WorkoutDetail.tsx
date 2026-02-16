@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Play, Clock, Flame, Check, Trash2 } from "lucide-react";
+import { Play, Clock, Flame, Check } from "lucide-react";
 import { useRouter } from "next/router";
 import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader";
@@ -374,11 +374,6 @@ export default function WorkoutDetail() {
                 />
               ))}
             </div>
-
-            <Button variant="ghost" size="sm" className="text-destructive">
-              <Trash2 className="w-4 h-4 mr-2" />
-              Excluir
-            </Button>
           </div>
         </>
       )}

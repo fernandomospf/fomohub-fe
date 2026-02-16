@@ -27,7 +27,7 @@ export function PageHeader({ title = "", showBack, showSettings, rightElement }:
               <ArrowLeft className="w-5 h-5" />
             </Button>
           )}
-          <Image src="/fomo-logo.png" alt="Fomo Logo" width={60} height={60} />
+          <Image src="/fomo-logo.png" alt="Fomo Logo" width={60} height={60} loading="eager"/>
           <h1 className="text-lg font-bold">{title}</h1>
         </div>
         <div className="flex items-center gap-2">
