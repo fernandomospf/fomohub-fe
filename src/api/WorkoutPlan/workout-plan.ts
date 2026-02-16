@@ -76,12 +76,22 @@ export class WorkoutPlanService {
     return this.api.get<WorkoutPlan[]>('workout-plans/public');
   }
 
-  public async listMyLikedPlans(): Promise<WorkoutPlan[]> {
-    return this.api.get<WorkoutPlan[]>('workout-plans/liked');
+  public async listMyLikedPlans({page = 1, limit = 10}: {page?: number, limit?: number}): Promise<WorkoutPlansResponse> {
+    return this.api.get<WorkoutPlansResponse>('workout-plans/liked', {
+      params: {
+        page: page.toString(),
+        limit: limit.toString(),
+      }
+    });
   }
 
-  public async listMyFavoritePlans(): Promise<WorkoutPlan[]> {
-    return this.api.get<WorkoutPlan[]>('workout-plans/favorite');
+  public async listMyFavoritePlans({page = 1, limit = 10}: {page?: number, limit?: number}): Promise<WorkoutPlansResponse> {
+    return this.api.get<WorkoutPlansResponse>('workout-plans/favorite', {
+      params: {
+        page: page.toString(),
+        limit: limit.toString(),
+      }
+    });
   }
 
   public async startWorkoutSession(planId: string): Promise<WorkoutSession> {

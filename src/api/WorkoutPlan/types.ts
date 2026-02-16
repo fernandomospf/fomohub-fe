@@ -55,7 +55,6 @@ export interface WorkoutPlan {
   goals: string[];
   id: string;
   is_favorite: boolean;
-  is_favorited: boolean;
   is_liked: boolean;
   is_public: boolean;
   likes_count: number;
