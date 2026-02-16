@@ -27,6 +27,7 @@ function Chip({
                 fontSize: '12px',
                 fontWeight: 'bold',
                 letterSpacing: '.6px',
+                textTransform: 'capitalize',
             }}
             onMouseEnter={(e) => {
                 if (!selected && !view) {
