@@ -27,7 +27,8 @@ import { TrendingPlans } from "@/components/organisms/TrendingPlans";
 import { UserData } from "@/types/user";
 import { Onboarding } from "./Onboarding";
 import { Input } from "@/components/atoms/input";
-import { WorkoutPlan } from "@/api/WorkoutPlan/types";
+import { ActiveWorkoutSession, WorkoutPlan } from "@/api/WorkoutPlan/types";
+import { LastTrainingResponse } from "@/api/Profile/types";
 import { ActiveWorkoutBanner } from "@/components/organisms/workout/ActiveWorkoutBanner";
 
 export default function Index() {
@@ -45,7 +46,9 @@ export default function Index() {
   const [startIndex, setStartIndex] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [offensiveDays, setOffensiveDays] = useState(0);
-  const [hasWorkoutActive, setHasWorkoutActive] = useState(true);
+  const [activeSession, setActiveSession] = useState<ActiveWorkoutSession | null>(null);
+  const [lastTraining, setLastTraining] = useState<LastTrainingResponse | null>(null);
+
   const [showDevModal, setShowDevModal] = useState(false);
 
   const [filters, setFilters] = useState<{
@@ -166,10 +169,14 @@ export default function Index() {
         setLoading(true);
         setError(null);
 
-        const profile = await profileService.get();
+        const [profile, lastTrainingData] = await Promise.all([
+          profileService.get(),
+          profileService.lastTraining(),
+        ]);
 
         if (!mounted) return;
         setUserData(profile);
+        setLastTraining(lastTrainingData);
       } catch (err) {
         console.error("Erro ao buscar profile:", err);
         if (mounted) setError("Não foi possível carregar seus dados.");
@@ -206,6 +213,46 @@ export default function Index() {
       setShowDevModal(true);
     }
   }, []);
+
+  useEffect(() => {
+  if (!session) return;
+
+  let mounted = true;
+
+  const fetchActiveSession = async () => {
+    try {
+      const response = await workoutPlanService.getActiveSession();
+
+      if (!mounted) return;
+
+      if (!response) {
+        setActiveSession(null);
+        return;
+      }
+
+      if ("data" in response) {
+        setActiveSession(response ?? null);
+        return;
+      }
+
+      setActiveSession(response);
+    } catch (err: any) {
+      if (err?.response?.status === 204) {
+        setActiveSession(null);
+        return;
+      }
+
+      console.error("Erro ao buscar sessão ativa:", err);
+      setActiveSession(null);
+    }
+  };
+
+  fetchActiveSession();
+
+  return () => {
+    mounted = false;
+  };
+}, [session?.user?.id]);
 
 
   if (sessionLoading || (session && loading)) {
@@ -389,14 +436,23 @@ export default function Index() {
               }
             </div>
             {
-              hasWorkoutActive && (
+              activeSession && (
                 <ActiveWorkoutBanner
-                  workoutId={1}
-                  workoutName="Treino de Teste"
-                  completedSets={0}
-                  totalSets={0}
-                  elapsedMinutes={0}
-                  onFinish={() => { }}
+                  workoutId={activeSession.workoutId}
+                  workoutName={activeSession.workoutName}
+                  completedSets={activeSession.completedSets}
+                  totalSets={activeSession.totalSets}
+                  elapsedMinutes={activeSession.elapsedMinutes}
+                  onFinish={async () => {
+                    try {
+                      await workoutPlanService.finishWorkoutSession(
+                        activeSession.sessionId
+                      );
+                      setActiveSession(null);
+                    } catch (err) {
+                      console.error("Erro ao finalizar treino:", err);
+                    }
+                  }}
                 />
               )
             }
@@ -418,21 +474,41 @@ export default function Index() {
                       Pronto para treinar?
                     </h2>
                     <div className="flex gap-1 flex-col mb-4">
-                      <span className="text-muted-foreground">Seu útimo treino foi há
-                        <span className="font-bold"> x dias</span>
-                      </span>
-                      <span className="text-muted-foreground">Treino de:
-                        <span className="font-bold"> XXXX</span>
-                      </span>
-                      <span className="text-muted-foreground">Próximo treino sugerido:
-                        <span className="font-bold"> XXXX</span>
-                      </span>
+                      {lastTraining?.lastTraining ? (
+                        <>
+                          {(() => {
+                            const finishedAt = lastTraining.lastTraining.finished_at
+                              ? new Date(lastTraining.lastTraining.finished_at)
+                              : null;
+                            const isValid = finishedAt && !isNaN(finishedAt.getTime());
+                            const days = isValid
+                              ? Math.floor((Date.now() - finishedAt.getTime()) / 86400000)
+                              : null;
+                            return (
+                              <span className="text-muted-foreground">
+                                {!days || days <= 0
+                                  ? <>Seu último treino foi <span className="font-bold">hoje</span></>
+                                  : <>Seu último treino foi há <span className="font-bold">{days} dia(s)</span></>
+                                }
+                              </span>
+                            );
+                          })()}
+                          <span className="text-muted-foreground">Treino de:
+                            <span className="font-bold"> {lastTraining.lastTraining.workout_plan?.name}</span>
+                          </span>
+                          <span className="text-muted-foreground">Músculos:
+                            <span className="font-bold"> {lastTraining.lastTraining.workout_plan?.muscle_groups?.join(", ")}</span>
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">Nenhum treino registrado ainda 🏋️</span>
+                      )}
                     </div>
                   </div>
 
                 </div>
                 {
-                  !hasWorkoutActive && (
+                  !activeSession && (
                     <Link href="/workouts">
                       <Button variant="gradient" size="lg" className="w-full">
                         <Zap className="w-5 h-5 mr-2" />

@@ -63,6 +63,10 @@ export class ApiRequest {
       );
     }
 
+    if (res.status === 204) {
+      return null as T;
+    }
+
     const contentType = res.headers.get('content-type');
 
     if (contentType?.includes('application/json')) {

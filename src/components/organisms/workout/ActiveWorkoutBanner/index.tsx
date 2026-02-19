@@ -3,7 +3,7 @@ import { Button } from "@/components/atoms/button";
 import Link from "next/link";
 
 interface ActiveWorkoutBannerProps {
-    workoutId: number;
+    workoutId: string;
     workoutName: string;
     completedSets: number;
     totalSets: number;
@@ -22,8 +22,8 @@ export function ActiveWorkoutBanner({
     const progress = totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
 
     return (
-        <div className="relative overflow-hidden rounded-2xl border border-primary/40 bg-card shadow-glow">
-            <div className="absolute inset-0 opacity-10 gradient-primary" />
+        <div className="relative overflow-hidden rounded-2xl glass cursor-pointer group transition-all duration-300 w-full">
+            <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl" />
 
             <div className="relative z-10 p-4">
                 <div className="flex items-center justify-between mb-3">

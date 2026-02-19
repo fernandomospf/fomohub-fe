@@ -28,12 +28,17 @@ const durations = [
 const muscleGroups = [
   { id: "peito", label: "Peito" },
   { id: "costas", label: "Costas" },
+  { id: "lombar", label: "Lombar" },
   { id: "ombros", label: "Ombros" },
   { id: "biceps", label: "Bíceps" },
   { id: "triceps", label: "Tríceps" },
-  { id: "pernas", label: "Pernas" },
-  { id: "abdomen", label: "Abdômen" },
+  { id: "antebraco", label: "Antebraço" },
+  { id: "quadriceps", label: "Quadríceps" },
+  { id: "posteriores", label: "Posteriores" },
   { id: "gluteos", label: "Glúteos" },
+  { id: "panturrilha", label: "Panturrilha" },
+  { id: "adutores", label: "Adutores" },
+  { id: "abdomen", label: "Abdômen" },
 ];
 
 const workoutSchema = z.object({
@@ -68,7 +73,7 @@ export default function SingleWorkout() {
     try {
       setIsGenerating(true);
 
-      const response = await aiService.generateWorkoutPlan({
+      const response = await aiService.generateSingleWorkout({
         goal: data.goal,
         time: Number(data.duration),
         muscles: data.muscles,

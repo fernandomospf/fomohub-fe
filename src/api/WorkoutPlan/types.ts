@@ -8,7 +8,11 @@ export interface WorkoutSession {
 
 export type ActiveWorkoutSession = {
   sessionId: string;
-  startedAt: string;
+  workoutId: string;
+  workoutName: string;
+  completedSets: number;
+  totalSets: number;
+  elapsedMinutes: number;
   exercises: Array<{
     workout_exercise_id: string;
     name: string;
@@ -19,6 +23,8 @@ export type ActiveWorkoutSession = {
     completed_sets: number;
   }>;
 };
+
+export type ActiveWorkoutSessionResponse = ActiveWorkoutSession | null;
 
 export interface ExerciseHistory {
   exercise_id: string;

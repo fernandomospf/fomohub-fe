@@ -1,5 +1,5 @@
 import { ApiRequest } from "../api";
-import { ActiveWorkoutSession, ExerciseByIdResponse, ExerciseHistory, WorkoutExercise, WorkoutPlan, WorkoutPlansResponse, WorkoutSession } from "./types";
+import { ActiveWorkoutSession, ActiveWorkoutSessionResponse, ExerciseByIdResponse, ExerciseHistory, WorkoutExercise, WorkoutPlan, WorkoutPlansResponse, WorkoutSession } from "./types";
 
 export class WorkoutPlanService {
   constructor(private api: ApiRequest) { }
@@ -59,7 +59,7 @@ export class WorkoutPlanService {
     );
   }
 
-  public async getAllMyPlans({page = 1, limit = 10}: {page?: number, limit?: number}): Promise<WorkoutPlansResponse> {
+  public async getAllMyPlans({ page = 1, limit = 10 }: { page?: number, limit?: number }): Promise<WorkoutPlansResponse> {
     return this.api.get<WorkoutPlansResponse>('workout-plans', {
       params: {
         page: page.toString(),
@@ -76,7 +76,7 @@ export class WorkoutPlanService {
     return this.api.get<WorkoutPlan[]>('workout-plans/public');
   }
 
-  public async listMyLikedPlans({page = 1, limit = 10}: {page?: number, limit?: number}): Promise<WorkoutPlansResponse> {
+  public async listMyLikedPlans({ page = 1, limit = 10 }: { page?: number, limit?: number }): Promise<WorkoutPlansResponse> {
     return this.api.get<WorkoutPlansResponse>('workout-plans/liked', {
       params: {
         page: page.toString(),
@@ -85,7 +85,7 @@ export class WorkoutPlanService {
     });
   }
 
-  public async listMyFavoritePlans({page = 1, limit = 10}: {page?: number, limit?: number}): Promise<WorkoutPlansResponse> {
+  public async listMyFavoritePlans({ page = 1, limit = 10 }: { page?: number, limit?: number }): Promise<WorkoutPlansResponse> {
     return this.api.get<WorkoutPlansResponse>('workout-plans/favorite', {
       params: {
         page: page.toString(),
@@ -149,16 +149,16 @@ export class WorkoutPlanService {
   public async turnPublic(planId: string) {
     return this.api.patch(
       `workout-plans/${planId}/public`, {
-        isPublic: true
-      }
+      isPublic: true
+    }
     )
   }
 
   public async turnPrivate(planId: string) {
     return this.api.patch(
       `workout-plans/${planId}/private`, {
-        isPublic: false
-      }
+      isPublic: false
+    }
     )
   }
 
@@ -166,5 +166,9 @@ export class WorkoutPlanService {
     return this.api.delete(
       `workout-plans/${planId}`
     )
+  }
+
+  public async getActiveSession(): Promise<ActiveWorkoutSessionResponse> {
+    return this.api.get<ActiveWorkoutSessionResponse>('workout-plans/sessions/active');
   }
 }
