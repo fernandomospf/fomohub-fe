@@ -249,8 +249,9 @@ export default function Workouts() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="meus-treinos">Meus treinos</TabsTrigger>
+              <TabsTrigger value="protocolos">Protocolos</TabsTrigger>
               <TabsTrigger value="treinos-favoritos">Favoritos</TabsTrigger>
               <TabsTrigger value="treinos-curtidos">Curtidos</TabsTrigger>
             </TabsList>
@@ -275,6 +276,48 @@ export default function Workouts() {
                   </div>
                 ) : (
                   filteredWorkouts.map((workout) => (
+                    <div
+                      key={workout.id}
+                      onClick={() => router.push(`/workouts/${workout.id}`)}
+                    >
+                      <WorkoutCard
+                        {...workout}
+                        onDelete={handleDeleteFromMyWorkouts}
+                      />
+                    </div>
+                  ))
+                )}
+
+                {loadingMore &&
+                  Array.from({ length: 2 }).map((_, index) => (
+                    <WorkoutCardSkeleton key={index} />
+                  ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="protocolos">
+              <div className="flex flex-col gap-4">
+                {loadingTab ? (
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <WorkoutCardSkeleton key={index} />
+                  ))
+                ) : []?.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-2 h-[300px] text-center">
+                    <div className="w-[180px] h-[180px] relative">
+                      <Image
+                        src="/empty_workout.png"
+                        alt="empty workout"
+                        fill
+                        className="object-contain"
+                        priority
+                      />
+                    </div>
+
+                    <p className="text-muted-foreground max-w-[260px]">
+                      Nenhum treino encontrado.
+                    </p>
+                  </div>
+                ) : (
+                  [].map((workout) => (
                     <div
                       key={workout.id}
                       onClick={() => router.push(`/workouts/${workout.id}`)}

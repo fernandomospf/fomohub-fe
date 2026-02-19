@@ -7,6 +7,8 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import "../src/index.css";
 import type { AppProps } from "next/app";
 import { useState } from "react";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
@@ -18,7 +20,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <Component {...pageProps} />
+            <div className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+              <Component {...pageProps} />
+            </div>
           </TooltipProvider>
         </WorkoutSessionProvider>
       </LanguageProvider>

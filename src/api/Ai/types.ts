@@ -1,6 +1,14 @@
 export interface GenerateWorkoutRequest {
-  goal: string;   
-  time: number;   
+  goals: string[];
+  weeklyFrequency: number;
+  sessionDurationMinutes: number;
+  experienceLevel: "iniciante" | "intermediario" | "avancado";
+  preferredSplit?: "auto" | "fullbody" | "upper_lower" | "ppl";
+}
+
+export interface GenerateSingleWorkoutRequest {
+  goal: string;
+  time: number;
   muscles: string[];
 }
 
@@ -9,12 +17,6 @@ export interface Exercise {
   sets: number;
   reps: string;
   rest: string;
-}
-
-export interface GenerateWorkoutResponse {
-  name: string;           
-  duration: number;       
-  exercises: Exercise[];  
 }
 
 export interface RemainingCreditsResponse {

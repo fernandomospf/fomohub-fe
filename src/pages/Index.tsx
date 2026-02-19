@@ -28,6 +28,7 @@ import { UserData } from "@/types/user";
 import { Onboarding } from "./Onboarding";
 import { Input } from "@/components/atoms/input";
 import { WorkoutPlan } from "@/api/WorkoutPlan/types";
+import { ActiveWorkoutBanner } from "@/components/organisms/workout/ActiveWorkoutBanner";
 
 export default function Index() {
   const router = useRouter();
@@ -44,6 +45,9 @@ export default function Index() {
   const [startIndex, setStartIndex] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [offensiveDays, setOffensiveDays] = useState(0);
+  const [hasWorkoutActive, setHasWorkoutActive] = useState(true);
+  const [showDevModal, setShowDevModal] = useState(false);
+
   const [filters, setFilters] = useState<{
     tags: string[];
     search: string;
@@ -195,6 +199,14 @@ export default function Index() {
     fetchTags();
   }, [workoutPlan]);
 
+  useEffect(() => {
+    const alreadySeen = localStorage.getItem("dev-modal-seen");
+
+    if (!alreadySeen) {
+      setShowDevModal(true);
+    }
+  }, []);
+
 
   if (sessionLoading || (session && loading)) {
     return (
@@ -229,10 +241,41 @@ export default function Index() {
   const canPaginate = filteredPlans.length > 2;
   const hasMore = visibleCount < filteredPlans.length;
 
-
   return (
     <MobileLayout>
       <PageHeader showSettings />
+      {showDevModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="glass rounded-2xl p-6 max-w-md w-full space-y-4">
+            <h2 className="text-xl font-bold">Sistema em desenvolvimento 🚧</h2>
+
+            <p className="text-muted-foreground text-sm">
+              Estamos evoluindo a plataforma constantemente.
+              Algumas funcionalidades podem estar em construção
+              ou sofrer ajustes nas próximas semanas.
+            </p>
+
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="gradient"
+                onClick={() => {
+                  localStorage.setItem("dev-modal-seen", "true");
+                  setShowDevModal(false);
+                }}
+              >
+                Entendi
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => setShowDevModal(false)}
+              >
+                Fechar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {userData?.onboarding_completed ? (
         <>
           <div className="px-4 py-6 space-y-6">
@@ -345,6 +388,18 @@ export default function Index() {
                 )
               }
             </div>
+            {
+              hasWorkoutActive && (
+                <ActiveWorkoutBanner
+                  workoutId={1}
+                  workoutName="Treino de Teste"
+                  completedSets={0}
+                  totalSets={0}
+                  elapsedMinutes={0}
+                  onFinish={() => { }}
+                />
+              )
+            }
             <div className="glass rounded-2xl p-6 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl" />
               <div className="relative z-10">
@@ -362,18 +417,32 @@ export default function Index() {
                     <h2 className="text-2xl font-bold mb-4">
                       Pronto para treinar?
                     </h2>
+                    <div className="flex gap-1 flex-col mb-4">
+                      <span className="text-muted-foreground">Seu útimo treino foi há
+                        <span className="font-bold"> x dias</span>
+                      </span>
+                      <span className="text-muted-foreground">Treino de:
+                        <span className="font-bold"> XXXX</span>
+                      </span>
+                      <span className="text-muted-foreground">Próximo treino sugerido:
+                        <span className="font-bold"> XXXX</span>
+                      </span>
+                    </div>
                   </div>
 
                 </div>
-                <Link href="/workouts">
-                  <Button variant="gradient" size="lg" className="w-full">
-                    <Zap className="w-5 h-5 mr-2" />
-                    Iniciar Treino
-                  </Button>
-                </Link>
+                {
+                  !hasWorkoutActive && (
+                    <Link href="/workouts">
+                      <Button variant="gradient" size="lg" className="w-full">
+                        <Zap className="w-5 h-5 mr-2" />
+                        Iniciar Treino
+                      </Button>
+                    </Link>
+                  )
+                }
               </div>
             </div>
-
             <div className="grid grid-cols-3 gap-3">
               {stats.map((stat) => (
                 <div
