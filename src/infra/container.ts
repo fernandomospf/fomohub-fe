@@ -5,6 +5,7 @@ import { ProfileService } from "@/api/Profile/profiles";
 import { WorkoutPlanService } from "@/api/WorkoutPlan/workout-plan";
 import { SupabaseTokenProvider } from "@/provider/SupabaseTokenProvider";
 import { TrainingProgramService } from '@/api/TrainigProgram/training-program';
+import { EventsService } from '@/api/Events/events';
 
 
 
@@ -18,3 +19,4 @@ export const measurementService = new MeasurementService(api);
 export const workoutPlanService = new WorkoutPlanService(api);
 export const aiService = new AiService(api);
 export const trainingProgramService = new TrainingProgramService(api);
+export const eventsService = new EventsService(api);

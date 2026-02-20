@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { CalendarIcon, MapPin, Clock, Image, Users, DollarSign } from "lucide-react";
+import { useForm, Controller } from "react-hook-form";
+import { CalendarIcon, MapPin, Clock, Image, Users, DollarSign, Loader2 } from "lucide-react";
 import { MobileLayout } from "../../src/components/templates/MobileLayout";
 import { PageHeader } from "../../src/components/templates/PageHeader";
 import { Button } from "../../src/components/atoms/button";
@@ -10,6 +11,9 @@ import { Label } from "../../src/components/atoms/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../src/components/atoms/select";
 import { Switch } from "../../src/components/atoms/switch";
 import { toast } from "../../src/hooks/use-toast";
+import { eventsService } from "../../src/infra/container";
+import { CreateEventDto } from "../../src/api/Events/types";
+import { supabase } from "../../src/lib/supabase";
 
 const categories = [
   { value: "catraca", label: "Catraca Livre" },
@@ -18,32 +22,106 @@ const categories = [
   { value: "trilha", label: "Trilha" },
 ];
 
+type FormData = Omit<CreateEventDto, "event_date"> & {
+  date: string;
+  time: string;
+};
+
 export default function CreateEvent() {
   const router = useRouter();
-  const [isFree, setIsFree] = useState(true);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { register, handleSubmit, control, watch } = useForm<FormData>({
+    defaultValues: {
+      is_free: true,
+    },
+  });
+
+  const is_free = watch("is_free");
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
+    try {
+      setIsUploading(true);
+      const ext = file.name.split(".").pop() ?? "webp";
+      const fileName = `events/${Date.now()}.${ext}`;
+
+      const { error } = await supabase.storage
+        .from("events")
+        .upload(fileName, file, { contentType: file.type, upsert: false });
+
+      if (error) throw error;
+
+      const { data: publicData } = supabase.storage
+        .from("events")
+        .getPublicUrl(fileName);
+
+      setImageUrl(publicData.publicUrl);
+    } catch (err: any) {
+      console.error("Erro ao fazer upload:", err);
+      setImageUrl(null);
+      setImagePreview(null);
+
+      const isRLS = err?.message?.toLowerCase().includes("row-level security") ||
+        err?.message?.toLowerCase().includes("policy") ||
+        err?.statusCode === "403";
+
+      toast({
+        title: "Não foi possível enviar a imagem",
+        description: isRLS
+          ? "Sem permissão para fazer upload. Você pode criar o evento sem imagem."
+          : "Tente novamente ou crie o evento sem imagem.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({ title: "Evento criado!", description: "Seu evento foi publicado com sucesso." });
-    router.push("/events");
+  const onSubmit = async (data: FormData) => {
+    try {
+      setIsSubmitting(true);
+
+      const event_date = data.date && data.time
+        ? new Date(`${data.date}T${data.time}:00`).toISOString()
+        : new Date(`${data.date}T00:00:00`).toISOString();
+
+      const payload: CreateEventDto = {
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        location: data.location,
+        event_date,
+        is_free: data.is_free,
+        image_url: imageUrl ?? undefined,
+        max_participants: data.max_participants ? Number(data.max_participants) : undefined,
+        price: !data.is_free && data.price ? Number(data.price) : undefined,
+      };
+
+      await eventsService.create(payload);
+      toast({ title: "Evento criado!", description: "Seu evento foi publicado com sucesso." });
+      router.push("/events");
+    } catch (err) {
+      console.error("Erro ao criar evento:", err);
+      toast({ title: "Erro", description: "Não foi possível criar o evento. Tente novamente.", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <MobileLayout hideNav>
       <PageHeader title="Criar Evento" showBack />
 
-      <form onSubmit={handleSubmit} className="px-4 py-6 space-y-6">
-        {/* Image Upload */}
+      <form onSubmit={handleSubmit(onSubmit)} className="px-4 py-6 space-y-6">
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider mb-2 block">
             Imagem do Evento
@@ -53,7 +131,19 @@ export default function CreateEvent() {
             className="flex flex-col items-center justify-center w-full h-44 rounded-2xl border-2 border-dashed border-border bg-secondary/50 cursor-pointer hover:bg-secondary transition-colors overflow-hidden"
           >
             {imagePreview ? (
-              <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+              <div className="relative w-full h-full">
+                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                {isUploading && (
+                  <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  </div>
+                )}
+                {!isUploading && imageUrl && (
+                  <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-success text-success-foreground text-xs font-semibold">
+                    ✓ Upload ok
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <Image className="w-8 h-8" />
@@ -70,7 +160,6 @@ export default function CreateEvent() {
           </label>
         </div>
 
-        {/* Title */}
         <div className="space-y-2">
           <Label htmlFor="title" className="text-muted-foreground text-xs uppercase tracking-wider">
             Título do Evento
@@ -78,31 +167,35 @@ export default function CreateEvent() {
           <Input
             id="title"
             placeholder="Ex: Corrida Noturna SP - 5km"
-            required
             className="h-12 bg-secondary border-0 rounded-xl"
+            {...register("title", { required: true })}
           />
         </div>
 
-        {/* Category */}
         <div className="space-y-2">
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">
             Categoria
           </Label>
-          <Select required>
-            <SelectTrigger className="h-12 bg-secondary border-0 rounded-xl">
-              <SelectValue placeholder="Selecione uma categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value}>
-                  {cat.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Controller
+            name="category"
+            control={control}
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger className="h-12 bg-secondary border-0 rounded-xl">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
 
-        {/* Description */}
         <div className="space-y-2">
           <Label htmlFor="description" className="text-muted-foreground text-xs uppercase tracking-wider">
             Descrição
@@ -111,10 +204,10 @@ export default function CreateEvent() {
             id="description"
             placeholder="Descreva os detalhes do evento..."
             className="bg-secondary border-0 rounded-xl min-h-[100px] resize-none"
+            {...register("description")}
           />
         </div>
 
-        {/* Date & Time */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
             <Label htmlFor="date" className="text-muted-foreground text-xs uppercase tracking-wider flex items-center gap-1.5">
@@ -123,8 +216,8 @@ export default function CreateEvent() {
             <Input
               id="date"
               type="date"
-              required
               className="h-12 bg-secondary border-0 rounded-xl"
+              {...register("date", { required: true })}
             />
           </div>
           <div className="space-y-2">
@@ -134,13 +227,12 @@ export default function CreateEvent() {
             <Input
               id="time"
               type="time"
-              required
               className="h-12 bg-secondary border-0 rounded-xl"
+              {...register("time")}
             />
           </div>
         </div>
 
-        {/* Location */}
         <div className="space-y-2">
           <Label htmlFor="location" className="text-muted-foreground text-xs uppercase tracking-wider flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5" /> Local
@@ -148,39 +240,44 @@ export default function CreateEvent() {
           <Input
             id="location"
             placeholder="Ex: Parque Ibirapuera"
-            required
             className="h-12 bg-secondary border-0 rounded-xl"
+            {...register("location")}
           />
         </div>
 
-        {/* Max Participants */}
         <div className="space-y-2">
-          <Label htmlFor="max-participants" className="text-muted-foreground text-xs uppercase tracking-wider flex items-center gap-1.5">
+          <Label htmlFor="max_participants" className="text-muted-foreground text-xs uppercase tracking-wider flex items-center gap-1.5">
             <Users className="w-3.5 h-3.5" /> Máx. Participantes
           </Label>
           <Input
-            id="max-participants"
+            id="max_participants"
             type="number"
             placeholder="Ilimitado"
             className="h-12 bg-secondary border-0 rounded-xl"
+            {...register("max_participants")}
           />
         </div>
 
-        {/* Free / Paid Toggle */}
         <div className="flex items-center justify-between p-4 bg-secondary rounded-xl">
           <div className="flex items-center gap-3">
             <DollarSign className="w-5 h-5 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium">Evento Gratuito</p>
               <p className="text-xs text-muted-foreground">
-                {isFree ? "Sem custo para participantes" : "Defina o valor abaixo"}
+                {is_free ? "Sem custo para participantes" : "Defina o valor abaixo"}
               </p>
             </div>
           </div>
-          <Switch checked={isFree} onCheckedChange={setIsFree} />
+          <Controller
+            name="is_free"
+            control={control}
+            render={({ field }) => (
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            )}
+          />
         </div>
 
-        {!isFree && (
+        {!is_free && (
           <div className="space-y-2">
             <Label htmlFor="price" className="text-muted-foreground text-xs uppercase tracking-wider">
               Valor (R$)
@@ -191,13 +288,19 @@ export default function CreateEvent() {
               step="0.01"
               placeholder="0,00"
               className="h-12 bg-secondary border-0 rounded-xl"
+              {...register("price")}
             />
           </div>
         )}
 
-        {/* Submit */}
-        <Button type="submit" variant="gradient" size="lg" className="w-full rounded-xl">
-          Publicar Evento
+        <Button
+          type="submit"
+          variant="gradient"
+          size="lg"
+          className="w-full rounded-xl"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Publicando..." : "Publicar Evento"}
         </Button>
       </form>
     </MobileLayout>
