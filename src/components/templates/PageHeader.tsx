@@ -1,13 +1,24 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, User, Settings, LogOut, ChevronRight, Circle } from "lucide-react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/atoms/button";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { FitnessData } from "@/types/user";
-import { profileService } from "@/infra/container";
-import Link from "next/link";
+import { useProfile } from "@/hooks/useProfile";
 import { Status } from "../atoms/status";
 import { ProfileCircle } from "../atoms/profileCircle";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "../atoms/dropdown-menu";
+import { supabase } from "@/lib/supabase";
+import { GeistSans } from "geist/font/sans";
+import { removeAccents } from "@/utils/remove_accents";
 
 interface PageHeaderProps {
   title?: string;
@@ -15,22 +26,19 @@ interface PageHeaderProps {
   rightElement?: React.ReactNode;
 }
 
+import { useState } from "react";
+import { StatusType } from "../atoms/status/type";
+
 export function PageHeader({ title = "", showBack, rightElement }: PageHeaderProps) {
-  const [profile, setProfile] = useState<FitnessData | null>(null);
   const router = useRouter();
-  useEffect(() => {
-    const fetchProfile = async () => {
+  const { data: profile } = useProfile();
+  const [currentStatus, setCurrentStatus] = useState<StatusType>("online");
 
-      try {
-        const userData = await profileService.dataProfile();
-        setProfile(userData as unknown as FitnessData);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      }
-    }
-    fetchProfile();
-  }, [])
-
+  const statusOptions: { value: StatusType; label: string; color: string }[] = [
+    { value: "online",  label: "Online",   color: "bg-green-500" },
+    { value: "away",    label: "Ausente",  color: "bg-yellow-500" },
+    { value: "offline", label: "Offline",  color: "bg-red-500" },
+  ];
   return (
     <header className="sticky top-0 z-40 glass-strong safe-top">
       <div className="flex items-center justify-between h-16 px-4">
@@ -51,11 +59,60 @@ export function PageHeader({ title = "", showBack, rightElement }: PageHeaderPro
         <div className="flex items-center gap-2">
           {rightElement}
           {(profile?.avatar_url && router.pathname !== "/profile") && (
-            <Link href="/profile">
-              <ProfileCircle picture={profile.avatar_url}>
-                <Status status="online" />
-              </ProfileCircle>
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                  <ProfileCircle picture={profile.avatar_url}>
+                    <Status status={currentStatus} />
+                  </ProfileCircle>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className={`w-56 ${GeistSans.className}`} align="end" forceMount>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="gap-2">
+                    <Circle className={`w-3 h-3 fill-current ${
+                      currentStatus === "online" ? "text-green-500" :
+                      currentStatus === "away" ? "text-yellow-500" : "text-red-500"
+                    }`} />
+                    <span>Status</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {statusOptions.map((opt) => (
+                      <DropdownMenuItem
+                        key={opt.value}
+                        className="gap-2 cursor-pointer"
+                        onClick={() => setCurrentStatus(opt.value)}
+                      >
+                        <div className={`w-2.5 h-2.5 rounded-full ${opt.color}`} />
+                        <span>{opt.label}</span>
+                        {currentStatus === opt.value && (
+                          <span className="ml-auto text-xs opacity-60">✓</span>
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuItem onClick={() => router.push("/profile")}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Meu Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/settings")}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Configurações</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    router.push("/login");
+                  }}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>

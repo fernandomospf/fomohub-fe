@@ -9,23 +9,26 @@ import type { AppProps } from "next/app";
 import { useState } from "react";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { ThemeProvider } from "next-themes";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <WorkoutSessionProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <div className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-              <Component {...pageProps} />
-            </div>
-          </TooltipProvider>
-        </WorkoutSessionProvider>
-      </LanguageProvider>
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <QueryClientProvider client={queryClient}>
+        <LanguageProvider>
+          <WorkoutSessionProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <div className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+                <Component {...pageProps} />
+              </div>
+            </TooltipProvider>
+          </WorkoutSessionProvider>
+        </LanguageProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

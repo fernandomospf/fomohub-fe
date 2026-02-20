@@ -1,5 +1,5 @@
 export type ProfileCircleProps = {
-    children: React.ReactNode;
+    children?: React.ReactNode;
     picture: string;
     size?: number;
 }

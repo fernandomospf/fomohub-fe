@@ -301,7 +301,7 @@ export default function Profile() {
               </div>
 
               <h2 className="text-xl font-bold mb-1">
-                {`@${removeAccents(profile?.social_name)}`}
+                {removeAccents(profile?.social_name)}
               </h2>
               <p className="text-muted-foreground text-sm mb-4">
                 Membro desde {format_date(profile?.created_at)}

@@ -2,38 +2,48 @@ import { Moon, Bell, Shield, HelpCircle, Info, ChevronRight } from "lucide-react
 import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader";
 import { Switch } from "@/components/atoms/switch";
-
-const settingsGroups = [
-  {
-    title: "Aparência",
-    items: [
-      { icon: Moon, label: "Tema Escuro", type: "switch", defaultValue: true },
-    ],
-  },
-  {
-    title: "Notificações",
-    items: [
-      { icon: Bell, label: "Notificações Push", type: "switch", defaultValue: true },
-      { icon: Bell, label: "Lembretes de Treino", type: "switch", defaultValue: true },
-    ],
-  },
-  {
-    title: "Privacidade",
-    items: [
-      { icon: Shield, label: "Perfil Privado", type: "switch", defaultValue: false },
-      { icon: Shield, label: "Esconder Progresso", type: "switch", defaultValue: true },
-    ],
-  },
-  {
-    title: "Sobre",
-    items: [
-      { icon: HelpCircle, label: "Ajuda", type: "link" },
-      { icon: Info, label: "Sobre o App", type: "link" },
-    ],
-  },
-];
+import { useTheme } from "next-themes";
 
 export default function Settings() {
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
+
+  const settingsGroups = [
+    {
+      title: "Aparência",
+      items: [
+        {
+          icon: Moon,
+          label: "Tema Escuro",
+          type: "switch",
+          checked: isDark,
+          onChange: (checked: boolean) => setTheme(checked ? "dark" : "light"),
+        },
+      ],
+    },
+    {
+      title: "Notificações",
+      items: [
+        { icon: Bell, label: "Notificações Push", type: "switch", defaultValue: true },
+        { icon: Bell, label: "Lembretes de Treino", type: "switch", defaultValue: true },
+      ],
+    },
+    {
+      title: "Privacidade",
+      items: [
+        { icon: Shield, label: "Perfil Privado", type: "switch", defaultValue: false },
+        { icon: Shield, label: "Esconder Progresso", type: "switch", defaultValue: true },
+      ],
+    },
+    {
+      title: "Sobre",
+      items: [
+        { icon: HelpCircle, label: "Ajuda", type: "link" },
+        { icon: Info, label: "Sobre o App", type: "link" },
+      ],
+    },
+  ];
+
   return (
     <MobileLayout hideNav>
       <PageHeader title="Configurações" showBack />
@@ -54,7 +64,11 @@ export default function Settings() {
                     <span className="font-medium">{item.label}</span>
                   </div>
                   {item.type === "switch" && (
-                    <Switch defaultChecked={item.defaultValue} />
+                    <Switch
+                      checked={"checked" in item ? item.checked : item.defaultValue}
+                      onCheckedChange={"onChange" in item ? item.onChange : undefined}
+                      defaultChecked={"defaultValue" in item && !("checked" in item) ? item.defaultValue : undefined}
+                    />
                   )}
                   {item.type === "link" && (
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
