@@ -14,7 +14,7 @@ export const MobileLayout = forwardRef<HTMLDivElement, MobileLayoutProps>(
       <div className={`min-h-[100dvh] h-[100dvh] flex flex-col ${className}`}>
         <main
           ref={ref}
-          className={cn("flex-1 overflow-y-auto", hideNav ? "" : "pb-24")}
+          className={cn("flex-1 overflow-y-auto", hideNav ? "" : "pb-24 md:pb-0 md:pl-64")}
         >
           {children}
         </main>

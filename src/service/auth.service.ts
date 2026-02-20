@@ -30,24 +30,45 @@ export async function signUp(
     },
   });
 
- if (error) {
-  if (error.message.includes('already registered')) {
-    toast({ 
-      title: 'Erro ao cadastrar',
-      description: 'Este email já está cadastrado' 
-    });
-    return;
-  }
+  if (error) {
+    if (error.message.includes('already registered')) {
+      toast({
+        title: 'Erro ao cadastrar',
+        description: 'Este email já está cadastrado'
+      });
+      return;
+    }
 
-  throw error;
-}}
+    throw error;
+  }
+}
 
 export async function signInWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
+  return supabase.auth.signInWithOAuth({
     provider: 'google',
+    options: {
+      redirectTo:
+        process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    }
+  });
+}
+
+export async function signInWithApple() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'apple',
     options: {
       redirectTo: `${window.location.origin}/auth/callback`,
     },
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function resetPassword(email: string) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
   });
 
   if (error) {

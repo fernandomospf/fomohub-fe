@@ -321,13 +321,7 @@ export default function Index() {
             <div className="glass rounded-2xl p-6 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl" />
               <div className="relative z-10">
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div style={{ width: 'fit-content' }}>
                     <p className="text-muted-foreground mb-1">
                       {t("home.greeting", { name: userData?.name?.split(' ')[0] || userData?.email || t("home.greeting_fallback") })}
@@ -373,8 +367,8 @@ export default function Index() {
                 </div>
                 {
                   !activeSession && (
-                    <Link href="/workouts">
-                      <Button variant="gradient" size="lg" className="w-full">
+                    <Link href="/workouts" className="w-full md:w-auto mt-4 md:mt-0">
+                      <Button variant="gradient" size="lg" className="w-full md:w-auto md:px-12">
                         <Zap className="w-5 h-5 mr-2" />
                         {t("home.start_training")}
                       </Button>
@@ -416,7 +410,7 @@ export default function Index() {
             </div>
             <div>
               <h2 className="text-md text-white mb-2 block" dangerouslySetInnerHTML={{ __html: t("home.trending_trainings") }} />
-              <div className="mt-4 flex flex-col gap-4">
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {
                   filteredWorkoutPlan()?.slice(0, visibleCount).map((workout: any) => (
                     <TrendingPlans
