@@ -8,8 +8,13 @@ export class WorkoutPlanService {
     return this.api.get<WorkoutPlan[]>('workout-plans');
   }
 
-  public async getPublicPlans(): Promise<WorkoutPlan[]> {
-    return this.api.get<WorkoutPlan[]>('workout-plans/public');
+  public async getPublicPlans({ page = 1, limit = 10 }: { page?: number, limit?: number } = {}): Promise<WorkoutPlansResponse> {
+    return this.api.get<WorkoutPlansResponse>('workout-plans/public', {
+      params: {
+        page: page.toString(),
+        limit: limit.toString(),
+      }
+    });
   }
 
   public async createPlan(payload: {
@@ -72,8 +77,13 @@ export class WorkoutPlanService {
     return this.api.get<ExerciseByIdResponse>(`workout-plans/${planId}`);
   }
 
-  public async getWorkoutPlanPublic(): Promise<WorkoutPlan[]> {
-    return this.api.get<WorkoutPlan[]>('workout-plans/public');
+  public async getWorkoutPlanPublic({ page = 1, limit = 10 }: { page?: number, limit?: number } = {}): Promise<WorkoutPlansResponse> {
+    return this.api.get<WorkoutPlansResponse>('workout-plans/public', {
+      params: {
+        page: page.toString(),
+        limit: limit.toString(),
+      }
+    });
   }
 
   public async listMyLikedPlans({ page = 1, limit = 10 }: { page?: number, limit?: number }): Promise<WorkoutPlansResponse> {

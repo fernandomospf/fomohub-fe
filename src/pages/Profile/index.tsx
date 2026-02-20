@@ -241,7 +241,7 @@ export default function Profile() {
 
   return (
     <MobileLayout>
-      <PageHeader showSettings />
+      <PageHeader/>
       {
         loading ? (
           <ProfileSkeleton />
@@ -342,7 +342,7 @@ export default function Profile() {
               )
             }
             <div className="glass rounded-2xl overflow-hidden p-4">
-              <h3 className="text-lg font-bold mb-1">Último treino foi</h3>
+              <h3 className="text-lg font-bold mb-1">Último treino</h3>
 
               {lastTraining?.lastTraining ? (
                 <>

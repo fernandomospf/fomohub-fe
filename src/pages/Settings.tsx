@@ -37,7 +37,6 @@ export default function Settings() {
   return (
     <MobileLayout hideNav>
       <PageHeader title="Configurações" showBack />
-
       <div className="px-4 py-6 space-y-6">
         {settingsGroups.map((group) => (
           <div key={group.title}>

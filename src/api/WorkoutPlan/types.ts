@@ -57,7 +57,7 @@ export interface WorkoutExercise {
 export interface WorkoutPlan {
   calories: number | null;
   created_at: string;
-  estimated_duration_minutes: number;
+  estimated_duration_minutes?: number;
   goals: string[];
   id: string;
   is_favorite: boolean;
@@ -104,30 +104,10 @@ export interface MetaPagination {
 }
 
 
-export interface DataResponseRequest {
-  id: string;
-  user_id: string;
-  name: string;
-  is_public: boolean;
-  is_favorite: boolean;
-  created_at: string;
-  updated_at: string;
-  likes_count: number;
-  rating_average: number | null;
-  ratings_count: number;
-  source_plan_id: string | null;
-  muscle_groups: string[];
-  goals: string[];
-  training_time: number;
-  workout_type: string;
-  calories: number | null;
-  is_favorited: boolean;
-  is_liked: boolean;
-  workout_exercises: WorkoutExercise[];
-}
+
 
 
 export interface WorkoutPlansResponse {
-  data: DataResponseRequest[];
+  data: WorkoutPlan[];
   meta: MetaPagination;
 }

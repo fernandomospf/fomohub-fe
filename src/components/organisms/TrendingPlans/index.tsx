@@ -17,7 +17,8 @@ export function TrendingPlans({
     is_public,
     muscle_groups,
     goals,
-}: WorkoutPlanResponse) {
+    disabledOnClick = false,
+}: WorkoutPlanResponse & { disabledOnClick?: boolean }) {
     const [isLiked, setIsLiked] = useState(is_liked ?? false);
 
     const handleLike = async (e: React.MouseEvent) => {
@@ -53,6 +54,7 @@ export function TrendingPlans({
             className="relative overflow-hidden rounded-2xl glass shadow-card cursor-pointer group transition-all duration-300"
             id={`trending-plan-${id}`}
         >
+            <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl" />
             <div
                 style={{
                     display: "flex",
@@ -81,6 +83,7 @@ export function TrendingPlans({
                     <Chip
                         key={index}
                         label={chip.label}
+                        disabledOnClick={disabledOnClick}
                         selected={chip.variant === "public"}
                         view={chip.variant === "view"}
                         customBackgroundColor={chip.variant === "public" ? "#b3591dff" : chip.variant === "goal" ? "#7c3aed" : chip.variant === "muscle" ? "#202126" : "#202126"}

@@ -3,6 +3,7 @@ interface ChipProps {
     selected?: boolean;
     view?: boolean;
     onClick?: () => void;
+    disabledOnClick?: boolean;
     customBackgroundColor?: string;
 }
 
@@ -11,6 +12,7 @@ function Chip({
     selected,
     view = false,
     onClick,
+    disabledOnClick = false,
     customBackgroundColor
 }: ChipProps) {
     return (
@@ -22,27 +24,28 @@ function Chip({
                 marginTop: '8px',
                 backgroundColor: customBackgroundColor ? customBackgroundColor : selected || view ? '#7c3aed' : '#202126',
                 color: customBackgroundColor ? 'white' : selected || view ? 'white' : '#fff9f9',
-                cursor: 'pointer',
+                cursor: disabledOnClick ? 'default' : 'pointer',
                 transition: 'all 0.2s ease',
                 fontSize: '12px',
                 fontWeight: 'bold',
                 letterSpacing: '.6px',
                 textTransform: 'capitalize',
+                pointerEvents: disabledOnClick ? 'none' : 'auto',
             }}
             onMouseEnter={(e) => {
-                if (!selected && !view) {
+                if (!selected && !view && !disabledOnClick) {
                     e.currentTarget.style.backgroundColor = '#7c3aed';
                     e.currentTarget.style.color = 'white';
                 }
             }}
-            onMouseLeave={(e) => {
-                if (!selected && !view) {
+            onMouseLeave={(e) => {  
+                if (!selected && !view && !disabledOnClick) {
                     e.currentTarget.style.backgroundColor = '#202126';
                     e.currentTarget.style.color = '#fff9f9';
                 }
             }}
             onClick={() => {
-                if (onClick) {
+                if (onClick && !disabledOnClick) {
                     onClick();
                 }
             }}

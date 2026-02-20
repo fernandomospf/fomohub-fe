@@ -1,18 +1,36 @@
-import { ArrowLeft, Settings, MessagesSquare } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/atoms/button";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { FitnessData } from "@/types/user";
+import { profileService } from "@/infra/container";
+import Link from "next/link";
+import { Status } from "../atoms/status";
+import { ProfileCircle } from "../atoms/profileCircle";
 
 interface PageHeaderProps {
   title?: string;
   showBack?: boolean;
-  showSettings?: boolean;
   rightElement?: React.ReactNode;
 }
 
-export function PageHeader({ title = "", showBack, showSettings, rightElement }: PageHeaderProps) {
+export function PageHeader({ title = "", showBack, rightElement }: PageHeaderProps) {
+  const [profile, setProfile] = useState<FitnessData | null>(null);
   const router = useRouter();
-//  { icon: MessagesSquare, label: "Chat", path: "/DirectMessages" }
+  useEffect(() => {
+    const fetchProfile = async () => {
+
+      try {
+        const userData = await profileService.dataProfile();
+        setProfile(userData as unknown as FitnessData);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    }
+    fetchProfile();
+  }, [])
+
   return (
     <header className="sticky top-0 z-40 glass-strong safe-top">
       <div className="flex items-center justify-between h-16 px-4">
@@ -27,28 +45,18 @@ export function PageHeader({ title = "", showBack, showSettings, rightElement }:
               <ArrowLeft className="w-5 h-5" />
             </Button>
           )}
-          <Image src="/fomo-logo.png" alt="Fomo Logo" width={60} height={60} loading="eager"/>
+          <Image src="/fomo-logo.png" alt="Fomo Logo" width={60} height={60} loading="eager" />
           <h1 className="text-lg font-bold">{title}</h1>
         </div>
         <div className="flex items-center gap-2">
           {rightElement}
-          {/* {showSettings && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => router.push("/settings")}
-              className="rounded-full"
-            >
-              <Settings className="w-5 h-5" />
-            </Button>
-          )} */}
-          <Button
-            variant="ghost"
-            onClick={() => router.push("/DirectMessages")}
-            className="rounded-full"
-          >
-            <MessagesSquare className="w-16 h-16" />
-          </Button>
+          {(profile?.avatar_url && router.pathname !== "/profile") && (
+            <Link href="/profile">
+              <ProfileCircle picture={profile.avatar_url}>
+                <Status status="online" />
+              </ProfileCircle>
+            </Link>
+          )}
         </div>
       </div>
     </header>

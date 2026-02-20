@@ -144,67 +144,66 @@ export default function Index() {
   useEffect(() => {
     if (sessionLoading || !session) return;
 
-    const fetchWorkoutPlan = async () => {
-      try {
-        const { offensiveDays } = await profileService.offensiveDays();
-        setOffensiveDays(offensiveDays);
-
-
-        const response = await workoutPlanService.getWorkoutPlanPublic();
-        setWorkoutPlan(response || []);
-      } catch (err) {
-        console.error("Erro ao buscar plano de treino:", err);
-      }
-    };
-    fetchWorkoutPlan();
-  }, [session, sessionLoading]);
-
-  useEffect(() => {
-    if (!session) return;
-
     let mounted = true;
 
-    async function loadProfile() {
+    const fetchInitialData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const [profile, lastTrainingData] = await Promise.all([
+        const [
+          profile,
+          lastTrainingData,
+          daysResult,
+          plansResponse,
+          goals,
+          muscleGroups,
+          activeSessionResult
+        ] = await Promise.all([
           profileService.get(),
           profileService.lastTraining(),
+          profileService.offensiveDays(),
+          workoutPlanService.getWorkoutPlanPublic(),
+          workoutPlanService.getGoalsTag(),
+          workoutPlanService.getMuscleGroupsTag(),
+          workoutPlanService.getActiveSession()
         ]);
 
         if (!mounted) return;
+
         setUserData(profile);
         setLastTraining(lastTrainingData);
-      } catch (err) {
-        console.error("Erro ao buscar profile:", err);
-        if (mounted) setError("Não foi possível carregar seus dados.");
+        setOffensiveDays(daysResult.offensiveDays);
+        setWorkoutPlan(plansResponse?.data || []);
+        setGoalsTag(goals);
+        setMuscleGroupTag(muscleGroups);
+
+        if (!activeSessionResult) {
+          setActiveSession(null);
+        } else if ("data" in activeSessionResult) {
+          setActiveSession(activeSessionResult ?? null);
+        } else {
+          setActiveSession(activeSessionResult);
+        }
+
+      } catch (err: any) {
+        if (err?.response?.status === 204) {
+          setActiveSession(null);
+        } else {
+          console.error("Erro ao carregar dados iniciais:", err);
+          setError("Não foi possível carregar seus dados.");
+        }
       } finally {
         if (mounted) setLoading(false);
       }
-    }
+    };
 
-    loadProfile();
+    fetchInitialData();
 
     return () => {
       mounted = false;
     };
-  }, [session]);
-
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const goalsTag = await workoutPlanService.getGoalsTag();
-        const muscleGroupTag = await workoutPlanService.getMuscleGroupsTag();
-        setGoalsTag(goalsTag);
-        setMuscleGroupTag(muscleGroupTag);
-      } catch (err) {
-        console.error("Erro ao buscar tags:", err);
-      }
-    };
-    fetchTags();
-  }, [workoutPlan]);
+  }, [session, sessionLoading]);
 
   useEffect(() => {
     const alreadySeen = localStorage.getItem("dev-modal-seen");
@@ -213,46 +212,6 @@ export default function Index() {
       setShowDevModal(true);
     }
   }, []);
-
-  useEffect(() => {
-  if (!session) return;
-
-  let mounted = true;
-
-  const fetchActiveSession = async () => {
-    try {
-      const response = await workoutPlanService.getActiveSession();
-
-      if (!mounted) return;
-
-      if (!response) {
-        setActiveSession(null);
-        return;
-      }
-
-      if ("data" in response) {
-        setActiveSession(response ?? null);
-        return;
-      }
-
-      setActiveSession(response);
-    } catch (err: any) {
-      if (err?.response?.status === 204) {
-        setActiveSession(null);
-        return;
-      }
-
-      console.error("Erro ao buscar sessão ativa:", err);
-      setActiveSession(null);
-    }
-  };
-
-  fetchActiveSession();
-
-  return () => {
-    mounted = false;
-  };
-}, [session?.user?.id]);
 
 
   if (sessionLoading || (session && loading)) {
@@ -290,7 +249,7 @@ export default function Index() {
 
   return (
     <MobileLayout>
-      <PageHeader showSettings />
+      <PageHeader />
       {showDevModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="glass rounded-2xl p-6 max-w-md w-full space-y-4">
@@ -525,6 +484,7 @@ export default function Index() {
                   key={stat.label}
                   className="glass rounded-xl p-3 text-center"
                 >
+                  <div className="absolute top-0 right-0 w-16 h-16 gradient-primary opacity-20 blur-3xl" />
                   <stat.icon className={`w-5 h-5 mx-auto mb-2 ${stat.color}`} />
                   <p className="text-lg font-bold">{stat.value}</p>
                   <p className="text-xs text-muted-foreground">{stat.unit}</p>
@@ -550,14 +510,15 @@ export default function Index() {
               ))}
             </div>
             <div>
-              <label className="text-md text-muted-foreground mb-2 block">
-                Treinos que estão BOMBANDO 💣
-              </label>
+              <h2 className="text-md text-white mb-2 block">
+                Treinos que estão <span className="font-bold">BOMBANDO</span> 💣
+              </h2>
               <div className="mt-4 flex flex-col gap-4">
                 {
                   filteredWorkoutPlan()?.slice(0, visibleCount).map((workout: any) => (
                     <TrendingPlans
                       key={workout.id}
+                      disabledOnClick={true}
                       {...workout}
                     />
                   ))
