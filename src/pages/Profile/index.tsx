@@ -239,7 +239,6 @@ export default function Profile() {
     setImageSrc(null);
   };
 
-  console.log(lastTraining?.lastTraining?.workout_plan?.name)
   return (
     <MobileLayout>
       <PageHeader showSettings />
