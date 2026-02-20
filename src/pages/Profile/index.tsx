@@ -18,7 +18,7 @@ import { Button } from "@/components/atoms/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/atoms/tabs";
 import { profileService } from "@/infra/container";
 import { FitnessData, Measurements } from "@/types/user";
-import { Loading } from "@/components/atoms/Loading";
+import { ProfileSkeleton } from "@/components/organisms/ProfileSkeleton";
 import { format_date } from "@/utils/moth_mapper";
 import { measureMapper } from "@/utils/measure_mapper";
 import { uploadAvatar } from "@/service/avatar";
@@ -245,7 +245,7 @@ export default function Profile() {
       <PageHeader showSettings />
       {
         loading ? (
-          <Loading />
+          <ProfileSkeleton />
         ) : (
           <div className="px-4 py-6 space-y-6">
             <div className="glass rounded-2xl p-6 text-center">

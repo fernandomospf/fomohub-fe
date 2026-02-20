@@ -21,7 +21,7 @@ import { Button } from "@/components/atoms/button";
 import { profileService, workoutPlanService } from "@/infra/container";
 import { useSession } from "@/hooks/useSession";
 import { useRouter } from "next/router";
-import { Loading } from "@/components/atoms/Loading";
+import { IndexSkeleton } from "@/components/organisms/IndexSkeleton";
 import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
 import { TrendingPlans } from "@/components/organisms/TrendingPlans";
 import { UserData } from "@/types/user";
@@ -259,7 +259,7 @@ export default function Index() {
     return (
       <MobileLayout>
         <PageHeader />
-        <Loading />
+        <IndexSkeleton />
       </MobileLayout>
     );
   }
