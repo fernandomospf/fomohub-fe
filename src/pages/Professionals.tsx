@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Filter, Star, Dumbbell, Apple, BadgeCheck } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { ProfessionalCard } from "@/components/organisms/professionals/ProfessionalCard";
 import { Input } from "@/components/atoms/input";
 import { cn } from "@/lib/utils";

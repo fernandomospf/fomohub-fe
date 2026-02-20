@@ -1,6 +1,6 @@
 import { Moon, Bell, Shield, HelpCircle, Info, ChevronRight } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { Switch } from "@/components/atoms/switch";
 import { useTheme } from "next-themes";
 

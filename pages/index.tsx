@@ -1,2 +1,2 @@
-import Index from "../src/pages/Index";
+import Index from "../src/pages/Home/Index";
 export default Index;

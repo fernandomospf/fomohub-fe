@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, ShoppingCart, Filter, Heart, Store } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { ProductCard } from "@/components/organisms/marketplace/ProductCard";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";

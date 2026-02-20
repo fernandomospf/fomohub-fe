@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { ProgressCard } from "@/components/organisms/progress/ProgressCard";
 import { Button } from "@/components/atoms/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/atoms/tabs";

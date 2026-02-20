@@ -1,209 +1,124 @@
 import {
-  Flame,
-  Trophy,
-  TrendingUp,
   Zap,
   ArrowRight,
   ArrowLeft,
   Search,
   Filter,
-  Sparkles,
-  Users,
-  ShoppingBag
 } from "lucide-react";
 import { Badge } from "@/components/atoms/badge";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { Button } from "@/components/atoms/button";
-import { profileService, workoutPlanService } from "@/infra/container";
+import { workoutPlanService } from "@/infra/container";
 import { useSession } from "@/hooks/useSession";
 import { useRouter } from "next/router";
 import { IndexSkeleton } from "@/components/organisms/IndexSkeleton";
-import { useWorkoutSession } from "@/contexts/WorkoutSessionContext";
 import { TrendingPlans } from "@/components/organisms/TrendingPlans";
-import { UserData } from "@/types/user";
-import { Onboarding } from "./Onboarding";
+import { Onboarding } from "../Onboarding";
 import { Input } from "@/components/atoms/input";
-import { ActiveWorkoutSession, WorkoutPlan } from "@/api/WorkoutPlan/types";
-import { LastTrainingResponse } from "@/api/Profile/types";
 import { ActiveWorkoutBanner } from "@/components/organisms/workout/ActiveWorkoutBanner";
+import { useMe } from "@/hooks/useMe";
+import { useLastTraining } from "@/hooks/useLastTraining";
+import { useOffensiveDays } from "@/hooks/useOffensiveDays";
+import { usePublicWorkoutPlans } from "@/hooks/usePublicWorkoutPlans";
+import { useGoalsTag } from "@/hooks/useGoalsTag";
+import { useMuscleGroupsTag } from "@/hooks/useMuscleGroupsTag";
+import { useActiveSession } from "@/hooks/useActiveSession";
+import { useHomeStore } from "./store";
+import { useTranslate } from "@/hooks/useTranslate";
 
 export default function Index() {
+  const { t } = useTranslate();
   const router = useRouter();
+  const {
+    loading,
+    setLoading,
+    error,
+    setError,
+    userData,
+    setUserData,
+    setWorkoutPlan,
+    muscleGroupTag,
+    setMuscleGroupTag,
+    goalsTag,
+    setGoalsTag,
+    visibleCount,
+    setVisibleCount,
+    startIndex,
+    setStartIndex,
+    showFilters,
+    setShowFilters,
+    setOffensiveDays,
+    activeSession,
+    setActiveSession,
+    lastTraining,
+    setLastTraining,
+    setActiveTag,
+    filters,
+    setFilters,
+    stats,
+    quickActions,
+    showDevModal,
+    setShowDevModal,
+    filteredWorkoutPlan,
+    handleSearch,
+    handleSelectedTag,
+    handleShowMore,
+    handleCollapse,
+  } = useHomeStore();
+  const { data: user, loading: userLoading } = useMe();
+  const { data: lastTrainingData, loading: lastTrainingLoading } = useLastTraining();
+  const { data: offensiveDaysData, loading: offensiveDaysLoading } = useOffensiveDays();
+  const { data: workoutPlanData, loading: workoutPlanLoading } = usePublicWorkoutPlans();
+  const { data: goalsTagData, loading: goalsTagLoading } = useGoalsTag();
+  const { data: muscleGroupTagData, loading: muscleGroupTagLoading } = useMuscleGroupsTag();
+  const { data: activeSessionData, loading: activeSessionLoading } = useActiveSession();
   const { session, loading: sessionLoading } = useSession();
-  const { isActive, elapsedSeconds, formatTime } = useWorkoutSession();
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan[]>([]);
-  const [muscleGroupTag, setMuscleGroupTag] = useState<string[] | null>(null);
-  const [goalsTag, setGoalsTag] = useState<string[] | null>(null);
-  const [visibleCount, setVisibleCount] = useState(2);
-  const [startIndex, setStartIndex] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
-  const [offensiveDays, setOffensiveDays] = useState(0);
-  const [activeSession, setActiveSession] = useState<ActiveWorkoutSession | null>(null);
-  const [lastTraining, setLastTraining] = useState<LastTrainingResponse | null>(null);
-
-  const [showDevModal, setShowDevModal] = useState(false);
-
-  const [filters, setFilters] = useState<{
-    tags: string[];
-    search: string;
-  }>({
-    tags: [],
-    search: "",
-  });
-
-  const stats = [
-    {
-      icon: Flame,
-      label: "Streak",
-      value: offensiveDays,
-      unit: "dias",
-      color: "text-orange-500",
-    },
-    {
-      icon: Trophy,
-      label: "Ranking",
-      value: "#3",
-      unit: "posição",
-      color: "text-yellow-500",
-    },
-    {
-      icon: TrendingUp,
-      label: "Progresso",
-      value: "+15%",
-      unit: "mês",
-      color: "text-success",
-    },
-  ];
-
-  const quickActions = [
-    { icon: Sparkles, label: "EvoluIA", path: "/ai-workout", gradient: true },
-    // { icon: Users, label: "Profissionais", path: "/professionals", gradient: false },
-    { icon: Trophy, label: "Ranking", path: "/ranking", gradient: false },
-    // { icon: ShoppingBag, label: "Loja", path: "/marketplace", gradient: false },
-  ];
-
 
   const PAGE_SIZE = 3;
-
-  const filteredWorkoutPlan = (): WorkoutPlan[] => {
-    return workoutPlan.filter((plan) => {
-      const matchesTag =
-        filters.tags.length === 0 ||
-        filters.tags.some(
-          (tag) =>
-            plan.muscle_groups.includes(tag) ||
-            plan.goals.includes(tag)
-        );
-
-      const matchesSearch =
-        filters.search.trim() === "" ||
-        plan.name
-          ?.toLowerCase()
-          .includes(filters.search.toLowerCase());
-
-      return matchesTag && matchesSearch;
-    });
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    setFilters((prev) => ({
-      ...prev,
-      search: value,
-    }));
-  };
-
-
-  const handleSelectedTag = (tagName: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      tags: prev.tags.includes(tagName)
-        ? prev.tags.filter((tag) => tag !== tagName)
-        : [...prev.tags, tagName],
-    }));
-  };
-
-
-  const handleShowMore = () => {
-    setVisibleCount((prev) => prev + 2);
-  };
-
-  const handleCollapse = () => {
-    setVisibleCount(2);
-  };
 
   useEffect(() => {
     if (sessionLoading || !session) return;
 
-    let mounted = true;
+    setLoading(
+      userLoading ||
+      lastTrainingLoading ||
+      offensiveDaysLoading ||
+      workoutPlanLoading ||
+      goalsTagLoading ||
+      muscleGroupTagLoading ||
+      activeSessionLoading
+    );
 
-    const fetchInitialData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    if (user !== undefined) setUserData(user);
+    if (lastTrainingData !== undefined) setLastTraining(lastTrainingData);
+    if (offensiveDaysData !== undefined) setOffensiveDays(offensiveDaysData || 0);
+    if (workoutPlanData !== undefined) setWorkoutPlan(workoutPlanData);
+    if (goalsTagData !== undefined) setGoalsTag(goalsTagData);
+    if (muscleGroupTagData !== undefined) setMuscleGroupTag(muscleGroupTagData);
+    if (activeSessionData !== undefined) setActiveSession(activeSessionData);
 
-        const [
-          profile,
-          lastTrainingData,
-          daysResult,
-          plansResponse,
-          goals,
-          muscleGroups,
-          activeSessionResult
-        ] = await Promise.all([
-          profileService.get(),
-          profileService.lastTraining(),
-          profileService.offensiveDays(),
-          workoutPlanService.getWorkoutPlanPublic(),
-          workoutPlanService.getGoalsTag(),
-          workoutPlanService.getMuscleGroupsTag(),
-          workoutPlanService.getActiveSession()
-        ]);
-
-        if (!mounted) return;
-
-        setUserData(profile);
-        setLastTraining(lastTrainingData);
-        setOffensiveDays(daysResult.offensiveDays);
-        setWorkoutPlan(plansResponse?.data || []);
-        setGoalsTag(goals);
-        setMuscleGroupTag(muscleGroups);
-
-        if (!activeSessionResult) {
-          setActiveSession(null);
-        } else if ("data" in activeSessionResult) {
-          setActiveSession(activeSessionResult ?? null);
-        } else {
-          setActiveSession(activeSessionResult);
-        }
-
-      } catch (err: any) {
-        if (err?.response?.status === 204) {
-          setActiveSession(null);
-        } else {
-          console.error("Erro ao carregar dados iniciais:", err);
-          setError("Não foi possível carregar seus dados.");
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    fetchInitialData();
-
-    return () => {
-      mounted = false;
-    };
-  }, [session, sessionLoading]);
+  }, [
+    session,
+    sessionLoading,
+    userLoading,
+    lastTrainingLoading,
+    offensiveDaysLoading,
+    workoutPlanLoading,
+    goalsTagLoading,
+    muscleGroupTagLoading,
+    activeSessionLoading,
+    user,
+    lastTrainingData,
+    offensiveDaysData,
+    workoutPlanData,
+    goalsTagData,
+    muscleGroupTagData,
+    activeSessionData,
+  ]);
 
   useEffect(() => {
     const alreadySeen = localStorage.getItem("dev-modal-seen");
@@ -212,7 +127,6 @@ export default function Index() {
       setShowDevModal(true);
     }
   }, []);
-
 
   if (sessionLoading || (session && loading)) {
     return (
@@ -233,9 +147,9 @@ export default function Index() {
       <MobileLayout>
         <PageHeader />
         <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-          <p className="text-destructive">{error}</p>
+          <p className="text-destructive">{t("home.error")}</p>
           <Button onClick={() => window.location.reload()}>
-            Tentar novamente
+            {t("home.try_again")}
           </Button>
         </div>
       </MobileLayout>
@@ -253,12 +167,11 @@ export default function Index() {
       {showDevModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="glass rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h2 className="text-xl font-bold">Sistema em desenvolvimento 🚧</h2>
-
+            <h2 className="text-xl font-bold">
+              {t("home.dev_mode")}
+            </h2>
             <p className="text-muted-foreground text-sm">
-              Estamos evoluindo a plataforma constantemente.
-              Algumas funcionalidades podem estar em construção
-              ou sofrer ajustes nas próximas semanas.
+              {t("home.dev_desc")}
             </p>
 
             <div className="flex flex-col gap-2">
@@ -269,14 +182,14 @@ export default function Index() {
                   setShowDevModal(false);
                 }}
               >
-                Entendi
+                {t("home.understood")}
               </Button>
 
               <Button
                 variant="outline"
                 onClick={() => setShowDevModal(false)}
               >
-                Fechar
+                {t("home.close")}
               </Button>
             </div>
           </div>
@@ -289,7 +202,7 @@ export default function Index() {
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar treino..."
+                  placeholder={t("home.search_placeholder")}
                   value={filters.search}
                   onChange={handleSearch}
                   className="pl-12 h-12 bg-secondary border-0 rounded-xl"
@@ -304,13 +217,13 @@ export default function Index() {
                 }}
               >
                 <Filter className="w-5 h-5 mr-2" />
-                Filtros
+                {t("home.filters_btn")}
               </Button>
               {
                 showFilters && (
                   <div className="flex flex-col gap-2 overflow-x-auto pb-1 scrollbar-hide">
                     <div className="flex gap-2 flex-col">
-                      <span className="text-muted-foreground">Objetivos</span>
+                      <span className="text-muted-foreground">{t("home.goals")}</span>
                       <div className="flex gap-2">
                         {goalsTag?.map((tag, index) => (
                           <Badge
@@ -325,14 +238,14 @@ export default function Index() {
                       </div>
                     </div>
                     <div className="flex gap-2 flex-col">
-                      <span className="text-muted-foreground">Grupos musculares</span>
+                      <span className="text-muted-foreground">{t("home.muscle_groups")}</span>
                       <div className="flex gap-2">
                         {startIndex > 0 && (
                           <Badge
                             variant="secondary"
                             className="cursor-pointer px-3 py-1"
                             onClick={() => {
-                              setStartIndex((prev) => Math.max(0, prev - PAGE_SIZE));
+                              setStartIndex(Math.max(0, startIndex - PAGE_SIZE));
                             }}
                           >
                             <ArrowLeft />
@@ -357,15 +270,8 @@ export default function Index() {
                             variant="secondary"
                             className="cursor-pointer px-3 py-1"
                             onClick={() => {
-                              setStartIndex((prev) => {
-                                const nextIndex = prev + PAGE_SIZE;
-
-                                if (nextIndex >= muscleGroupTag.length) {
-                                  return 0;
-                                }
-
-                                return nextIndex;
-                              });
+                              const nextIndex = startIndex + PAGE_SIZE;
+                              setStartIndex(nextIndex >= muscleGroupTag.length ? 0 : nextIndex);
                             }}
                           >
                             <ArrowRight />
@@ -378,15 +284,12 @@ export default function Index() {
                           variant="outline"
                           className="mx-auto w-60 border-primary text-primary hover:bg-primary/10"
                           onClick={() => {
-                            setFilters({
-                              search: "",
-                              tags: []
-                            });
+                            setFilters({ search: '', tags: [] });
                             setActiveTag(null);
                             setStartIndex(0);
                           }}
                         >
-                          Limpar filtros
+                          {t("home.clear_filters")}
                         </Button>
                       )}
                     </div>
@@ -409,7 +312,7 @@ export default function Index() {
                       );
                       setActiveSession(null);
                     } catch (err) {
-                      console.error("Erro ao finalizar treino:", err);
+                      console.error("[ERROR - Home/Index.tsx] Erro ao finalizar treino:", err);
                     }
                   }}
                 />
@@ -427,10 +330,10 @@ export default function Index() {
                 >
                   <div style={{ width: 'fit-content' }}>
                     <p className="text-muted-foreground mb-1">
-                      Olá, {userData?.name?.split(' ')[0] || userData?.email || "Atleta"} 💪
+                      {t("home.greeting", { name: userData?.name?.split(' ')[0] || userData?.email || t("home.greeting_fallback") })}
                     </p>
                     <h2 className="text-2xl font-bold mb-4">
-                      Pronto para treinar?
+                      {t("home.ready_to_train")}
                     </h2>
                     <div className="flex gap-1 flex-col mb-4">
                       {lastTraining?.lastTraining ? (
@@ -444,23 +347,25 @@ export default function Index() {
                               ? Math.floor((Date.now() - finishedAt.getTime()) / 86400000)
                               : null;
                             return (
-                              <span className="text-muted-foreground">
-                                {!days || days <= 0
-                                  ? <>Seu último treino foi <span className="font-bold">hoje</span></>
-                                  : <>Seu último treino foi há <span className="font-bold">{days} dia(s)</span></>
-                                }
-                              </span>
+                              <span
+                                className="text-muted-foreground"
+                                dangerouslySetInnerHTML={{
+                                  __html: !days || days <= 0
+                                    ? t("home.last_training_today")
+                                    : t("home.last_training_days", { days })
+                                }}
+                              />
                             );
                           })()}
-                          <span className="text-muted-foreground">Treino de:
+                          <span className="text-muted-foreground">{t("home.training_of")}
                             <span className="font-bold"> {lastTraining.lastTraining.workout_plan?.name}</span>
                           </span>
-                          <span className="text-muted-foreground">Músculos:
+                          <span className="text-muted-foreground">{t("home.muscles")}
                             <span className="font-bold"> {lastTraining.lastTraining.workout_plan?.muscle_groups?.join(", ")}</span>
                           </span>
                         </>
                       ) : (
-                        <span className="text-muted-foreground">Nenhum treino registrado ainda 🏋️</span>
+                        <span className="text-muted-foreground">{t("home.no_training_yet")}</span>
                       )}
                     </div>
                   </div>
@@ -471,7 +376,7 @@ export default function Index() {
                     <Link href="/workouts">
                       <Button variant="gradient" size="lg" className="w-full">
                         <Zap className="w-5 h-5 mr-2" />
-                        Iniciar Treino
+                        {t("home.start_training")}
                       </Button>
                     </Link>
                   )
@@ -510,9 +415,7 @@ export default function Index() {
               ))}
             </div>
             <div>
-              <h2 className="text-md text-white mb-2 block">
-                Treinos que estão <span className="font-bold">BOMBANDO</span> 💣
-              </h2>
+              <h2 className="text-md text-white mb-2 block" dangerouslySetInnerHTML={{ __html: t("home.trending_trainings") }} />
               <div className="mt-4 flex flex-col gap-4">
                 {
                   filteredWorkoutPlan()?.slice(0, visibleCount).map((workout: any) => (
@@ -532,7 +435,7 @@ export default function Index() {
                       onClick={handleShowMore}
                       className="w-full border-primary text-primary hover:bg-primary/10"
                     >
-                      Ver mais
+                      {t("home.see_more")}
                     </Button>
                   ) : (
                     <Button
@@ -540,7 +443,7 @@ export default function Index() {
                       onClick={handleCollapse}
                       className="w-full border-primary text-primary hover:bg-primary/10"
                     >
-                      Recolher
+                      {t("home.collapse")}
                     </Button>
                   )}
                 </div>

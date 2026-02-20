@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import { CalendarIcon, MapPin, Clock, Image, Users, DollarSign, Loader2 } from "lucide-react";
 import { MobileLayout } from "../../src/components/templates/MobileLayout";
-import { PageHeader } from "../../src/components/templates/PageHeader";
+import { PageHeader } from "../../src/components/templates/PageHeader/PageHeader";
 import { Button } from "../../src/components/atoms/button";
 import { Input } from "../../src/components/atoms/input";
 import { Textarea } from "../../src/components/atoms/textarea";

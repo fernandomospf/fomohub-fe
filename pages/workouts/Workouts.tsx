@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Plus, Search, Sparkles } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { WorkoutCard } from "@/components/organisms/workout/WorkoutCard";
 import { WorkoutCardSkeleton } from "@/components/atoms/SkeletonWorkout";
 import { Input } from "@/components/atoms/input";
@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/atoms/tab
 import { workoutPlanService } from "@/infra/container";
 import { WorkoutsPageSkeleton } from "@/components/atoms/WorkoutsPageSkeleton";
 import {
-  DataResponseRequest,
+  WorkoutPlan,
   WorkoutPlansResponse,
 } from "@/api/WorkoutPlan/types";
 import Image from "next/image";
@@ -21,9 +21,9 @@ export default function Workouts() {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [myWorkouts, setMyWorkouts] = useState<DataResponseRequest[]>([]);
-  const [myLikedWorkouts, setMyLikedWorkouts] = useState<DataResponseRequest[]>([]);
-  const [myFavoriteWorkouts, setMyFavoriteWorkouts] = useState<DataResponseRequest[]>([]);
+  const [myWorkouts, setMyWorkouts] = useState<WorkoutPlan[]>([]);
+  const [myLikedWorkouts, setMyLikedWorkouts] = useState<WorkoutPlan[]>([]);
+  const [myFavoriteWorkouts, setMyFavoriteWorkouts] = useState<WorkoutPlan[]>([]);
 
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);

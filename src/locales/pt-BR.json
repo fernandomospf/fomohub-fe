@@ -29,5 +29,30 @@
         "success_description": "Sua nova ficha foi criada e estará disponível na lista de treinos.",
         "error_title": "Erro ao criar ficha",
         "error_description": "Ocorreu um erro ao criar sua ficha. Por favor, tente novamente."
+    },
+    "home": {
+        "dev_mode": "Sistema em desenvolvimento 🚧",
+        "dev_desc": "Estamos evoluindo a plataforma constantemente. Algumas funcionalidades podem estar em construção ou sofrer ajustes nas próximas semanas.",
+        "understood": "Entendi",
+        "close": "Fechar",
+        "search_placeholder": "Buscar treino...",
+        "filters_btn": "Filtros",
+        "goals": "Objetivos",
+        "muscle_groups": "Grupos musculares",
+        "clear_filters": "Limpar filtros",
+        "greeting": "Olá, {{name}} 💪",
+        "greeting_fallback": "Atleta",
+        "ready_to_train": "Pronto para treinar?",
+        "last_training_today": "Seu último treino foi <bold>hoje</bold>",
+        "last_training_days": "Seu último treino foi há <bold>{{days}} dia(s)</bold>",
+        "training_of": "Treino de:",
+        "muscles": "Músculos:",
+        "no_training_yet": "Nenhum treino registrado ainda 🏋️",
+        "start_training": "Iniciar Treino",
+        "trending_trainings": "Treinos que estão <bold>BOMBANDO</bold> 💣",
+        "see_more": "Ver mais",
+        "collapse": "Recolher",
+        "error": "Não foi possível carregar seus dados.",
+        "try_again": "Tentar novamente"
     }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Search, Plus, Calendar as CalendarIcon, MapPin, Ticket } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { cn } from "@/lib/utils";

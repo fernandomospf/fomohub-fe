@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Sparkles, Dumbbell, Zap, Clock } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { Button } from "@/components/atoms/button";
 import { cn } from "@/lib/utils";
 import { trainingProgramService } from "@/infra/container";

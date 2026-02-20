@@ -29,5 +29,30 @@
         "success_description": "Tu nueva rutina ha sido creada y estará disponible en la lista de entrenamientos.",
         "error_title": "Error al crear la rutina",
         "error_description": "Ocurrió un error al crear tu rutina. Por favor, inténtalo de nuevo."
+    },
+    "home": {
+        "dev_mode": "Sistema en desarrollo 🚧",
+        "dev_desc": "Estamos evolucionando la plataforma constantemente. Algunas funciones pueden estar en construcción o sufrir ajustes en las próximas semanas.",
+        "understood": "Entendido",
+        "close": "Cerrar",
+        "search_placeholder": "Buscar entrenamiento...",
+        "filters_btn": "Filtros",
+        "goals": "Objetivos",
+        "muscle_groups": "Grupos musculares",
+        "clear_filters": "Limpiar filtros",
+        "greeting": "Hola, {{name}} 💪",
+        "greeting_fallback": "Atleta",
+        "ready_to_train": "¿Listo para entrenar?",
+        "last_training_today": "Tu último entrenamiento fue <bold>hoy</bold>",
+        "last_training_days": "Tu último entrenamiento fue hace <bold>{{days}} día(s)</bold>",
+        "training_of": "Rutina de:",
+        "muscles": "Músculos:",
+        "no_training_yet": "Ningún entrenamiento registrado aún 🏋️",
+        "start_training": "Iniciar Entrenamiento",
+        "trending_trainings": "Entrenamientos <bold>EN TENDENCIA</bold> 💣",
+        "see_more": "Ver más",
+        "collapse": "Ocultar",
+        "error": "No fue posible cargar tus datos.",
+        "try_again": "Intentar de nuevo"
     }
 }

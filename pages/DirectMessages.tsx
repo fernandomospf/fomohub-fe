@@ -3,7 +3,7 @@ import { Send, Image, MessageCircle } from "lucide-react";
 import { useRouter } from "next/router";
 
 import { MobileLayout } from "../src/components/templates/MobileLayout";
-import { PageHeader } from "../src/components/templates/PageHeader";
+import { PageHeader } from "../src/components/templates/PageHeader/PageHeader.tsx";
 import { ChatMessage } from "../src/components/organisms/ChatMessage.tsx";
 import { DirectMessages } from "../src/components/organisms/DirectMessages.tsx";
 import { Button } from "../src/components/atoms/button";

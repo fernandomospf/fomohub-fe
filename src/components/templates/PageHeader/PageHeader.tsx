@@ -1,44 +1,33 @@
-import { ArrowLeft, User, Settings, LogOut, ChevronRight, Circle } from "lucide-react";
+import { ArrowLeft, User, Settings, LogOut, Circle, Bell } from "lucide-react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/atoms/button";
 import Image from "next/image";
 import { useProfile } from "@/hooks/useProfile";
-import { Status } from "../atoms/status";
-import { ProfileCircle } from "../atoms/profileCircle";
+import { Status } from "../../atoms/status";
+import { ProfileCircle } from "../../atoms/profileCircle";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "../atoms/dropdown-menu";
+} from "../../atoms/dropdown-menu";
 import { supabase } from "@/lib/supabase";
 import { GeistSans } from "geist/font/sans";
-import { removeAccents } from "@/utils/remove_accents";
-
-interface PageHeaderProps {
-  title?: string;
-  showBack?: boolean;
-  rightElement?: React.ReactNode;
-}
-
-import { useState } from "react";
-import { StatusType } from "../atoms/status/type";
+import { usePageHeaderStore } from "./store";
+import { PageHeaderProps } from "./type";
 
 export function PageHeader({ title = "", showBack, rightElement }: PageHeaderProps) {
   const router = useRouter();
   const { data: profile } = useProfile();
-  const [currentStatus, setCurrentStatus] = useState<StatusType>("online");
+  const { currentStatus, statusOptions, setCurrentStatus } = usePageHeaderStore();
+  const notificationCount = 5;
+  const hasNotifications = notificationCount > 0;
+  const notificationLabel = notificationCount > 99 ? "99+" : String(notificationCount);
 
-  const statusOptions: { value: StatusType; label: string; color: string }[] = [
-    { value: "online",  label: "Online",   color: "bg-green-500" },
-    { value: "away",    label: "Ausente",  color: "bg-yellow-500" },
-    { value: "offline", label: "Offline",  color: "bg-red-500" },
-  ];
   return (
     <header className="sticky top-0 z-40 glass-strong safe-top">
       <div className="flex items-center justify-between h-16 px-4">
@@ -58,6 +47,17 @@ export function PageHeader({ title = "", showBack, rightElement }: PageHeaderPro
         </div>
         <div className="flex items-center gap-2">
           {rightElement}
+          <DropdownMenu>
+            <DropdownMenuContent align="end" className={`w-80 ${GeistSans.className}`}>
+              <div className="flex flex-col p-4">
+                <h3 className="text-sm font-bold mb-2">Notificações</h3>
+                <DropdownMenuSeparator />
+                <div className="py-8 text-center">
+                  <p className="text-sm text-muted-foreground">Sua caixa de mensagens está vazia.</p>
+                </div>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {(profile?.avatar_url && router.pathname !== "/profile") && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

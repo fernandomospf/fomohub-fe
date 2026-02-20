@@ -29,5 +29,30 @@
         "success_description": "Your new workout has been created and will be available in the workout list.",
         "error_title": "Error creating workout",
         "error_description": "An error occurred while creating your workout. Please try again."
+    },
+    "home": {
+        "dev_mode": "System in development 🚧",
+        "dev_desc": "We are constantly evolving the platform. Some features may be under construction or undergo adjustments in the coming weeks.",
+        "understood": "Got it",
+        "close": "Close",
+        "search_placeholder": "Search workout...",
+        "filters_btn": "Filters",
+        "goals": "Goals",
+        "muscle_groups": "Muscle groups",
+        "clear_filters": "Clear filters",
+        "greeting": "Hello, {{name}} 💪",
+        "greeting_fallback": "Athlete",
+        "ready_to_train": "Ready to train?",
+        "last_training_today": "Your last workout was <bold>today</bold>",
+        "last_training_days": "Your last workout was <bold>{{days}} day(s)</bold> ago",
+        "training_of": "Workout:",
+        "muscles": "Muscles:",
+        "no_training_yet": "No workout recorded yet 🏋️",
+        "start_training": "Start Workout",
+        "trending_trainings": "Workouts that are <bold>TRENDING</bold> 💣",
+        "see_more": "See more",
+        "collapse": "Collapse",
+        "error": "Could not load your data.",
+        "try_again": "Try again"
     }
 }

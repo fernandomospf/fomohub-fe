@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Play, Clock, Flame, Check } from "lucide-react";
 import { useRouter } from "next/router";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { ExerciseItem } from "@/components/organisms/workout/ExerciseItem";
 import { RestTimer } from "@/components/organisms/workout/RestTimer";
 import { Button } from "@/components/atoms/button";

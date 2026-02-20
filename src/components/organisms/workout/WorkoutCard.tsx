@@ -34,14 +34,14 @@ export function WorkoutCard({
   imageUrl,
   workout_exercises,
   muscle_groups,
-  is_favorited,
+  is_favorite,
   is_liked,
   is_public,
   onFavorite,
   onDelete,
 }: WorkoutCardProps) {
   const [isLiked, setIsLiked] = useState<boolean>(is_liked ?? false);
-  const [isFavorite, setIsFavorite] = useState<boolean>(is_favorited ?? false);
+  const [isFavoriteState, setIsFavoriteState] = useState<boolean>(is_favorite ?? false);
   const [isPublic, setIsPublic] = useState<boolean>(is_public ?? false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
@@ -53,8 +53,8 @@ export function WorkoutCard({
   }, [is_liked]);
 
   useEffect(() => {
-    setIsFavorite(is_favorited ?? false);
-  }, [is_favorited]);
+    setIsFavoriteState(is_favorite ?? false);
+  }, [is_favorite]);
 
   useEffect(() => {
     setIsPublic(is_public ?? false);
@@ -67,7 +67,7 @@ export function WorkoutCard({
 
     try {
       const res = await workoutPlanService.toggleFavorite(id);
-      setIsFavorite(res.favorite);
+      setIsFavoriteState(res.favorite);
 
       toast.success(
         res.favorite
@@ -199,10 +199,10 @@ export function WorkoutCard({
                   <Bookmark
                     className={cn(
                       "w-4 h-4 mr-2",
-                      isFavorite && "fill-current"
+                      isFavoriteState && "fill-current"
                     )}
                   />
-                  {isFavorite ? "Remover favorito" : "Favoritar"}
+                  {isFavoriteState ? "Remover favorito" : "Favoritar"}
                 </DropdownMenuItem>
 
                 <DropdownMenuItem onClick={handleLike}>

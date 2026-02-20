@@ -18,7 +18,6 @@ export interface WorkoutCardProps {
   calories: string;
   is_liked: boolean;
   workout_exercises: Array<Exercise>;
-  is_favorited: boolean;
   is_public?: boolean;
   is_favorite?: boolean;
   like_count?: number;
@@ -56,7 +55,6 @@ export interface WorkoutPlan {
   training_time: number;
   calories: number | null;
   is_favorite: boolean;
-  is_favorited: boolean;
   is_liked: boolean;
   is_public: boolean;
   likes_count: number;

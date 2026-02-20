@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { Sparkles, Target, Calendar } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { cn } from "@/lib/utils";
 
 export default function ChooseWorkoutGeneration() {

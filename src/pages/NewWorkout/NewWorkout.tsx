@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useForm, useFieldArray, UseFormRegister } from "react-hook-form";
 
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { toast } from "@/hooks/use-toast";

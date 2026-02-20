@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Camera, Users, Trophy, Plus } from "lucide-react";
 import { MobileLayout } from "@/components/templates/MobileLayout";
-import { PageHeader } from "@/components/templates/PageHeader";
+import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
 import { RankingCard } from "@/components/organisms/ranking/RankingCard";
 import { Button } from "@/components/atoms/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/atoms/tabs";
