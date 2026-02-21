@@ -102,13 +102,21 @@ export function PageHeader({
           <div className="md:hidden">
             {loading ? (
               <Skeleton className="w-10 h-10 rounded-full" />
-            ) : (profile?.avatar_url && router.pathname !== "/profile") && (
+            ) : ((profile?.avatar_url || profile?.social_name) && router.pathname !== "/profile") && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
-                    <ProfileCircle picture={profile.avatar_url}>
-                      <Status status={currentStatus} />
-                    </ProfileCircle>
+                    {
+                      profile?.avatar_url ? (
+                        <ProfileCircle picture={profile.avatar_url}>
+                          <Status status={currentStatus} />
+                        </ProfileCircle>
+                      ) : (
+                        <ProfileCircle username={profile?.social_name}>
+                          <Status status={currentStatus} />
+                        </ProfileCircle>
+                      )
+                    }
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className={`w-56 ${GeistSans.className}`} align="end" forceMount>

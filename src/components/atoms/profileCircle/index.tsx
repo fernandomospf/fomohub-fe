@@ -1,7 +1,16 @@
 import Image from "next/image";
 import { ProfileCircleProps } from "./type";
 
-export const ProfileCircle = ({ children, picture, size = 40 }: ProfileCircleProps) => {
+const getInitials = (name?: string) => {
+    if (!name) return "";
+    const names = name.trim().split(/\s+/);
+    if (names.length > 1) {
+        return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    }
+    return names[0].substring(0, 2).toUpperCase();
+}
+
+export const ProfileCircle = ({ children, picture, username, size = 40 }: ProfileCircleProps) => {
     return (
         <div className="relative inline-block">
             <div
@@ -16,13 +25,28 @@ export const ProfileCircle = ({ children, picture, size = 40 }: ProfileCirclePro
                     50% { opacity: 0; box-shadow: 0 0 0px 0px transparent; }
                 }
             `}</style>
-            <Image
-                src={picture}
-                alt="Profile"
-                width={size}
-                height={size}
-                className="rounded-full relative z-10"
-            />
+            {
+                picture ? (
+                    <Image
+                        src={picture}
+                        alt="Profile"
+                        width={size}
+                        height={size}
+                        className="rounded-full relative z-10"
+                    />
+                ) : (
+                    <div
+                        className="rounded-full relative z-10 flex items-center justify-center"
+                        style={{
+                            width: size,
+                            height: size,
+                            backgroundColor: '#7c3aed',
+                        }}
+                    >
+                        <span className="text-white font-bold">{getInitials(username)}</span>
+                    </div>
+                )
+            }
             {children}
         </div>
     );

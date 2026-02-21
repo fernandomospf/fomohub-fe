@@ -42,7 +42,7 @@ const navItems = [
   // { icon: Trophy, label: "Ranking", path: "/ranking" },
   // { icon: ShoppingBag, label: "Loja", path: "/marketplace" },
   { icon: Calendar, label: "Eventos", path: "/events" },
-  { icon: User, label: "Perfil", path: "/profile" },
+  // { icon: User, label: "Perfil", path: "/profile" },
 ];
 
 export function BottomNav() {

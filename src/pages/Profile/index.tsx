@@ -219,7 +219,8 @@ export default function Profile() {
       croppedAreaPixels
     );
 
-    const avatarUrl = await uploadAvatar(croppedFile, user);
+    const rawAvatarUrl = await uploadAvatar(croppedFile, user);
+    const avatarUrl = `${rawAvatarUrl}?t=${Date.now()}`;
 
     await supabase
       .from("profile_fitness_data")

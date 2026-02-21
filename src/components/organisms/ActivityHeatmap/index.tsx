@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -28,19 +28,21 @@ function generateActivityData(): Record<string, number> {
 }
 
 export function ActivityHeatmap() {
-  const activityData = useMemo(() => generateActivityData(), []);
+  const [activityData, setActivityData] = useState<Record<string, number>>({});
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Build a grid of 53 columns x 7 rows (weeks x days)
+  useEffect(() => {
+    setActivityData(generateActivityData());
+    setIsMounted(true);
+  }, []);
+
   const { grid, monthHeaders, totalActivities } = useMemo(() => {
     const today = new Date();
-    const todayDay = today.getDay(); // 0=Sun
-    // End of current week (Saturday)
+    const todayDay = today.getDay();
     const endDate = new Date(today);
     endDate.setDate(today.getDate() + (6 - todayDay));
-    // Start 52 weeks before that Sunday
     const startDate = new Date(endDate);
     startDate.setDate(endDate.getDate() - 52 * 7 + 1);
-    // Align start to Sunday
     startDate.setDate(startDate.getDate() - startDate.getDay());
 
     const weeks: { date: string; level: number }[][] = [];
@@ -59,7 +61,6 @@ export function ActivityHeatmap() {
         if (level > 0) total += level;
         week.push({ date: key, level });
 
-        // Track month changes on first day of week
         if (d === 0) {
           const m = cur.getMonth();
           if (m !== lastMonth) {
