@@ -201,7 +201,7 @@ export default function Workouts() {
 
   return (
     <MobileLayout ref={scrollContainerRef}>
-      <PageHeader />
+      <PageHeader loading={loadingInitial} onboardingCompleted={true}/>
       {loadingInitial ? (
         <div className="px-4 py-6 space-y-4">
           {Array.from({ length: 5 }).map((_, index) => (
@@ -230,7 +230,7 @@ export default function Workouts() {
                   <Sparkles className="w-6 h-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="font-semibold">EvoluIA</p>
+                  <p className="font-semibold">Evolu<span className="text-primary">IA</span></p>
                   <p className="text-sm text-muted-foreground">
                     Monte seu treino exclusivo com IA
                   </p>
