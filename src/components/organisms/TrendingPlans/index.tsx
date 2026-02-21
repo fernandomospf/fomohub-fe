@@ -23,6 +23,7 @@ export function TrendingPlans({
 
     const handleLike = async (e: React.MouseEvent) => {
         e.preventDefault();
+        e.stopPropagation();
         try {
             const res = await workoutPlanService.toggleLike(id);
             if (res) {
@@ -54,7 +55,7 @@ export function TrendingPlans({
             className="relative overflow-hidden rounded-2xl glass shadow-card cursor-pointer group transition-all duration-300"
             id={`trending-plan-${id}`}
         >
-            <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl" />
+            <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl pointer-events-none" />
             <div
                 style={{
                     display: "flex",

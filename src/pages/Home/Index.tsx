@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/atoms/badge";
 import Link from "next/link";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { MobileLayout } from "@/components/templates/MobileLayout";
 import { PageHeader } from "@/components/templates/PageHeader/PageHeader";
@@ -16,6 +16,7 @@ import { workoutPlanService } from "@/infra/container";
 import { useSession } from "@/hooks/useSession";
 import { useRouter } from "next/router";
 import { IndexSkeleton } from "@/components/organisms/IndexSkeleton";
+import { WorkoutCardSkeleton } from "@/components/atoms/SkeletonWorkout";
 import { TrendingPlans } from "@/components/organisms/TrendingPlans";
 import { Onboarding } from "../Onboarding";
 import { Input } from "@/components/atoms/input";
@@ -40,13 +41,20 @@ export default function Index() {
     setError,
     userData,
     setUserData,
+    workoutPlan,
     setWorkoutPlan,
     muscleGroupTag,
     setMuscleGroupTag,
     goalsTag,
     setGoalsTag,
-    visibleCount,
-    setVisibleCount,
+    offset,
+    setOffset,
+    limit,
+    setLimit,
+    hasMore,
+    setHasMore,
+    loadingMore,
+    setLoadingMore,
     startIndex,
     setStartIndex,
     showFilters,
@@ -66,19 +74,69 @@ export default function Index() {
     filteredWorkoutPlan,
     handleSearch,
     handleSelectedTag,
-    handleShowMore,
-    handleCollapse,
   } = useHomeStore();
   const { data: user, loading: userLoading } = useMe();
   const { data: lastTrainingData, loading: lastTrainingLoading } = useLastTraining();
   const { data: offensiveDaysData, loading: offensiveDaysLoading } = useOffensiveDays();
-  const { data: workoutPlanData, loading: workoutPlanLoading } = usePublicWorkoutPlans();
   const { data: goalsTagData, loading: goalsTagLoading } = useGoalsTag();
   const { data: muscleGroupTagData, loading: muscleGroupTagLoading } = useMuscleGroupsTag();
   const { data: activeSessionData, loading: activeSessionLoading } = useActiveSession();
   const { session, loading: sessionLoading } = useSession();
 
   const PAGE_SIZE = 3;
+  const scrollContainerRef = React.useRef<HTMLDivElement | null>(null);
+  const [loadingInitial, setLoadingInitial] = React.useState(true);
+
+  const loadTrendingPlansRef = React.useRef(false);
+
+  const loadTrendingPlans = React.useCallback(async (newOffset = 5, append = false) => {
+    if (loadTrendingPlansRef.current) return;
+    loadTrendingPlansRef.current = true;
+
+    try {
+      if (append) setLoadingMore(true);
+      else {
+        setLoadingInitial(true);
+      }
+
+      const response = await workoutPlanService.getWorkoutPlanPublic({
+        offset: newOffset,
+        limit: limit,
+      });
+
+      const currentPlans = useHomeStore.getState().workoutPlan;
+      let nextPlans = response.data;
+      if (append) {
+        const newUniqueItems = response.data.filter(
+          (newItem) => !currentPlans.some((existingItem) => existingItem.id === newItem.id)
+        );
+        nextPlans = [...currentPlans, ...newUniqueItems];
+      }
+
+      setWorkoutPlan(nextPlans);
+      
+      const isEndReached = response.data.length < limit || newOffset + response.data.length >= response.meta.total;
+      setHasMore(!isEndReached); 
+      setOffset(newOffset);
+    } catch (err) {
+      console.error("[ERROR - Home/Index.tsx] Erro ao carregar treinos públicos:", err);
+      setError("Erro ao carregar treinos públicos");
+    } finally {
+      setLoadingInitial(false);
+      setLoadingMore(false);
+      setTimeout(() => {
+        loadTrendingPlansRef.current = false;
+      }, 500);
+    }
+  }, [limit]);
+
+  useEffect(() => {
+    if (sessionLoading || !session) return;
+    if (workoutPlan.length === 0) {
+      loadTrendingPlans(0, false);
+    }
+  }, [session, sessionLoading]);
+
 
   useEffect(() => {
     if (sessionLoading || !session) return;
@@ -87,16 +145,15 @@ export default function Index() {
       userLoading ||
       lastTrainingLoading ||
       offensiveDaysLoading ||
-      workoutPlanLoading ||
       goalsTagLoading ||
       muscleGroupTagLoading ||
-      activeSessionLoading
+      activeSessionLoading ||
+      loadingInitial
     );
 
     if (user !== undefined) setUserData(user);
     if (lastTrainingData !== undefined) setLastTraining(lastTrainingData);
     if (offensiveDaysData !== undefined) setOffensiveDays(offensiveDaysData || 0);
-    if (workoutPlanData !== undefined) setWorkoutPlan(workoutPlanData);
     if (goalsTagData !== undefined) setGoalsTag(goalsTagData);
     if (muscleGroupTagData !== undefined) setMuscleGroupTag(muscleGroupTagData);
     if (activeSessionData !== undefined) setActiveSession(activeSessionData);
@@ -107,18 +164,38 @@ export default function Index() {
     userLoading,
     lastTrainingLoading,
     offensiveDaysLoading,
-    workoutPlanLoading,
     goalsTagLoading,
     muscleGroupTagLoading,
     activeSessionLoading,
+    loadingInitial,
     user,
     lastTrainingData,
     offensiveDaysData,
-    workoutPlanData,
     goalsTagData,
     muscleGroupTagData,
     activeSessionData,
   ]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+
+      const reachedBottom =
+        scrollTop + clientHeight >= scrollHeight - 400;
+
+      const { hasMore: freshHasMore, limit: freshLimit, offset: freshOffset, loadingMore: freshLoadingMore } = useHomeStore.getState();
+
+      if (!reachedBottom || freshLoadingMore || !freshHasMore) return;
+
+      loadTrendingPlans(freshOffset + freshLimit, true);
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [loadTrendingPlans, loading, sessionLoading]);
 
   useEffect(() => {
     const alreadySeen = localStorage.getItem("dev-modal-seen");
@@ -130,7 +207,7 @@ export default function Index() {
 
   if (sessionLoading || (session && loading)) {
     return (
-      <MobileLayout>
+      <MobileLayout ref={scrollContainerRef}>
         <PageHeader />
         <IndexSkeleton />
       </MobileLayout>
@@ -158,12 +235,9 @@ export default function Index() {
 
   const filteredPlans = filteredWorkoutPlan();
 
-  const canPaginate = filteredPlans.length > 2;
-  const hasMore = visibleCount < filteredPlans.length;
-
   return (
-    <MobileLayout>
-      <PageHeader 
+    <MobileLayout ref={scrollContainerRef}>
+      <PageHeader
         searchQuery={filters.search}
         setSearchQuery={handleSearch}
         placeholder={t("home.search_placeholder")}
@@ -202,95 +276,6 @@ export default function Index() {
       {userData?.onboarding_completed ? (
         <>
           <div className="px-4 py-6 space-y-6">
-            <div className="space-y-3">
-              <Button
-                variant={showFilters ? "gradient" : "outline"}
-                className="mx-auto w-30"
-                onClick={() => {
-                  setShowFilters(!showFilters);
-                }}
-              >
-                <Filter className="w-5 h-5 mr-2" />
-                {t("home.filters_btn")}
-              </Button>
-              {
-                showFilters && (
-                  <div className="flex flex-col gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                    <div className="flex gap-2 flex-col">
-                      <span className="text-muted-foreground">{t("home.goals")}</span>
-                      <div className="flex gap-2">
-                        {goalsTag?.map((tag, index) => (
-                          <Badge
-                            key={`${tag}-${index}`}
-                            variant={filters.tags.includes(tag) ? "default" : "secondary"}
-                            className="cursor-pointer whitespace-nowrap px-3 py-1.5 text-sm"
-                            onClick={() => handleSelectedTag(tag)}
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex gap-2 flex-col">
-                      <span className="text-muted-foreground">{t("home.muscle_groups")}</span>
-                      <div className="flex gap-2">
-                        {startIndex > 0 && (
-                          <Badge
-                            variant="secondary"
-                            className="cursor-pointer px-3 py-1"
-                            onClick={() => {
-                              setStartIndex(Math.max(0, startIndex - PAGE_SIZE));
-                            }}
-                          >
-                            <ArrowLeft />
-                          </Badge>
-                        )}
-
-                        {muscleGroupTag
-                          ?.slice(startIndex, startIndex + PAGE_SIZE)
-                          .map((tag, index) => (
-                            <Badge
-                              key={`${tag}-${index}`}
-                              variant={filters.tags.includes(tag) ? "default" : "secondary"}
-                              className="cursor-pointer whitespace-nowrap px-3 py-1.5 text-sm"
-                              onClick={() => handleSelectedTag(tag)}
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-
-                        {muscleGroupTag && muscleGroupTag.length > PAGE_SIZE && (
-                          <Badge
-                            variant="secondary"
-                            className="cursor-pointer px-3 py-1"
-                            onClick={() => {
-                              const nextIndex = startIndex + PAGE_SIZE;
-                              setStartIndex(nextIndex >= muscleGroupTag.length ? 0 : nextIndex);
-                            }}
-                          >
-                            <ArrowRight />
-                          </Badge>
-                        )}
-                      </div>
-
-                      {(filters.tags.length > 0 || filters.search.length > 0) && (
-                        <Button
-                          variant="outline"
-                          className="mx-auto w-60 border-primary text-primary hover:bg-primary/10"
-                          onClick={() => {
-                            setFilters({ search: '', tags: [] });
-                            setActiveTag(null);
-                            setStartIndex(0);
-                          }}
-                        >
-                          {t("home.clear_filters")}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )
-              }
-            </div>
             {
               activeSession && (
                 <ActiveWorkoutBanner
@@ -315,7 +300,7 @@ export default function Index() {
             <div className="glass rounded-2xl p-6 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-20 blur-3xl" />
               <div className="relative z-10">
-              <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div style={{ width: 'fit-content' }}>
                     <p className="text-muted-foreground mb-1">
                       {t("home.greeting", { name: userData?.name?.split(' ')[0] || userData?.email || t("home.greeting_fallback") })}
@@ -403,10 +388,98 @@ export default function Index() {
               ))}
             </div>
             <div>
+              <div className="flex mb-6">
+                <Button
+                  variant={showFilters ? "gradient" : "outline"}
+                  onClick={() => {
+                    setShowFilters(!showFilters);
+                  }}
+                >
+                  <Filter className="w-5 h-5 mr-2" />
+                  {t("home.filters_btn")}
+                </Button>
+              </div>
+              {
+                showFilters && (
+                  <div className="flex flex-col gap-2 overflow-x-auto pb-1 mb-6 scrollbar-hide">
+                    <div className="flex gap-2 flex-col">
+                      <span className="text-muted-foreground">{t("home.goals")}</span>
+                      <div className="flex gap-2">
+                        {goalsTag?.map((tag, index) => (
+                          <Badge
+                            key={`${tag}-${index}`}
+                            variant={filters.tags.includes(tag) ? "default" : "secondary"}
+                            className="cursor-pointer whitespace-nowrap px-3 py-1.5 text-sm"
+                            onClick={() => handleSelectedTag(tag)}
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 flex-col">
+                      <span className="text-muted-foreground">{t("home.muscle_groups")}</span>
+                      <div className="flex gap-2">
+                        {startIndex > 0 && (
+                          <Badge
+                            variant="secondary"
+                            className="cursor-pointer px-3 py-1"
+                            onClick={() => {
+                              setStartIndex(Math.max(0, startIndex - PAGE_SIZE));
+                            }}
+                          >
+                            <ArrowLeft />
+                          </Badge>
+                        )}
+
+                        {muscleGroupTag
+                          ?.slice(startIndex, startIndex + PAGE_SIZE)
+                          .map((tag, index) => (
+                            <Badge
+                              key={`${tag}-${index}`}
+                              variant={filters.tags.includes(tag) ? "default" : "secondary"}
+                              className="cursor-pointer whitespace-nowrap px-3 py-1.5 text-sm"
+                              onClick={() => handleSelectedTag(tag)}
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+
+                        {muscleGroupTag && muscleGroupTag.length > PAGE_SIZE && (
+                          <Badge
+                            variant="secondary"
+                            className="cursor-pointer px-3 py-1"
+                            onClick={() => {
+                              const nextIndex = startIndex + PAGE_SIZE;
+                              setStartIndex(nextIndex >= muscleGroupTag.length ? 0 : nextIndex);
+                            }}
+                          >
+                            <ArrowRight />
+                          </Badge>
+                        )}
+                      </div>
+
+                      {(filters.tags.length > 0 || filters.search.length > 0) && (
+                        <Button
+                          variant="outline"
+                          className="mx-auto w-60 border-primary text-primary hover:bg-primary/10"
+                          onClick={() => {
+                            setFilters({ search: '', tags: [] });
+                            setActiveTag(null);
+                            setStartIndex(0);
+                          }}
+                        >
+                          {t("home.clear_filters")}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )
+              }
               <h2 className="text-md text-white mb-2 block" dangerouslySetInnerHTML={{ __html: t("home.trending_trainings") }} />
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {
-                  filteredWorkoutPlan()?.slice(0, visibleCount).map((workout: any) => (
+                  filteredWorkoutPlan()?.map((workout: any) => (
                     <TrendingPlans
                       key={workout.id}
                       disabledOnClick={true}
@@ -415,25 +488,11 @@ export default function Index() {
                   ))
                 }
               </div>
-              {canPaginate && (
-                <div className="mt-4 flex justify-center">
-                  {hasMore ? (
-                    <Button
-                      variant="outline"
-                      onClick={handleShowMore}
-                      className="w-full border-primary text-primary hover:bg-primary/10"
-                    >
-                      {t("home.see_more")}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      onClick={handleCollapse}
-                      className="w-full border-primary text-primary hover:bg-primary/10"
-                    >
-                      {t("home.collapse")}
-                    </Button>
-                  )}
+              {loadingMore && (
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <WorkoutCardSkeleton key={index} />
+                  ))}
                 </div>
               )}
             </div>

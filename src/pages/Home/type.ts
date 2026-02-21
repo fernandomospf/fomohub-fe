@@ -31,7 +31,9 @@ export type HomeState = {
     workoutPlan: WorkoutPlan[];
     muscleGroupTag: string[] | null;
     goalsTag: string[] | null;
-    visibleCount: number;
+    offset: number;
+    hasMore: boolean;
+    loadingMore: boolean;
     startIndex: number;
     showFilters: boolean;
     offensiveDays: number;
@@ -43,6 +45,7 @@ export type HomeState = {
     stats: Stats[];
     quickActions: QuickActions[];
     showDevModal: boolean;
+    limit: number;
 }
 
 export type HomeActions = {
@@ -52,7 +55,9 @@ export type HomeActions = {
     setWorkoutPlan: (workoutPlan: WorkoutPlan[]) => void;
     setMuscleGroupTag: (muscleGroupTag: string[] | null) => void;
     setGoalsTag: (goalsTag: string[] | null) => void;
-    setVisibleCount: (visibleCount: number) => void;
+    setOffset: (offset: number) => void;
+    setHasMore: (hasMore: boolean) => void;
+    setLoadingMore: (loadingMore: boolean) => void;
     setStartIndex: (startIndex: number) => void;
     setShowFilters: (showFilters: boolean) => void;
     setOffensiveDays: (offensiveDays: number) => void;
@@ -65,8 +70,7 @@ export type HomeActions = {
     filteredWorkoutPlan: () => WorkoutPlan[];
     handleSearch: (search: string) => void;
     handleSelectedTag: (tagName: string) => void;
-    handleShowMore: () => void;
-    handleCollapse: () => void;
+    setLimit: (limit: number) => void;
 }
 
 export type HomeStore = HomeState & HomeActions

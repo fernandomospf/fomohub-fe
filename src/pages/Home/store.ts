@@ -16,8 +16,14 @@ export const useHomeStore = create<HomeStore>((set, get) => ({
     setMuscleGroupTag: (muscleGroupTag) => set({ muscleGroupTag }),
     goalsTag: null,
     setGoalsTag: (goalsTag) => set({ goalsTag }),
-    visibleCount: 2,
-    setVisibleCount: (visibleCount) => set({ visibleCount }),
+    offset: 0,
+    setOffset: (offset) => set({ offset }),
+    limit: 10,
+    setLimit: (limit) => set({ limit }),
+    hasMore: true,
+    setHasMore: (hasMore) => set({ hasMore }),
+    loadingMore: false,
+    setLoadingMore: (loadingMore) => set({ loadingMore }),
     startIndex: 0,
     setStartIndex: (startIndex) => set({ startIndex }),
     showFilters: false,
@@ -35,15 +41,15 @@ export const useHomeStore = create<HomeStore>((set, get) => ({
     activeTag: null,
     setActiveTag: (activeTag) => set({ activeTag }),
     stats: [
-        { icon: Flame, label: "Streak", value: "0", unit: "dias", color: "text-orange-500" },
-        { icon: Trophy, label: "Ranking", value: "#0", unit: "posição", color: "text-yellow-500" },
-        { icon: TrendingUp, label: "Progresso", value: "0%", unit: "mês", color: "text-success" },
+        { icon: Flame as any, label: "Streak", value: "0", unit: "dias", color: "text-orange-500" },
+        { icon: Trophy as any, label: "Ranking", value: "#0", unit: "posição", color: "text-yellow-500" },
+        { icon: TrendingUp as any, label: "Progresso", value: "0%", unit: "mês", color: "text-success" },
     ],
     setStats: (stats) => set({ stats }),
     quickActions: [
-        { icon: Sparkles, label: "EvoluIA", path: "/ai-workout", gradient: true },
+        { icon: Sparkles as any, label: "EvoluIA", path: "/ai-workout", gradient: true },
         // { icon: Users, label: "Profissionais", path: "/professionals", gradient: false },
-        { icon: Trophy, label: "Ranking", path: "/ranking", gradient: false },
+        { icon: Trophy as any, label: "Ranking", path: "/ranking", gradient: false },
         // { icon: ShoppingBag, label: "Loja", path: "/marketplace", gradient: false },
     ],
     setQuickActions: (quickActions) => set({ quickActions }),
@@ -84,14 +90,4 @@ export const useHomeStore = create<HomeStore>((set, get) => ({
             : [...filters.tags, tagName],
         });
       },
-      handleShowMore: () => {
-        const { setVisibleCount, visibleCount, workoutPlan } = get();
-        const newVisibleCount = visibleCount + 3;
-        setVisibleCount(Math.min(newVisibleCount, workoutPlan.length));
-      },
-      handleCollapse: () => {
-        const { setVisibleCount } = get();
-        setVisibleCount(2);
-      },
-        
 }));

@@ -77,13 +77,12 @@ export class WorkoutPlanService {
     return this.api.get<ExerciseByIdResponse>(`workout-plans/${planId}`);
   }
 
-  public async getWorkoutPlanPublic({ page = 1, limit = 10 }: { page?: number, limit?: number } = {}): Promise<WorkoutPlansResponse> {
-    return this.api.get<WorkoutPlansResponse>('workout-plans/public', {
-      params: {
-        page: page.toString(),
-        limit: limit.toString(),
-      }
-    });
+  public async getWorkoutPlanPublic({ page, offset, limit = 10 }: { page?: number, offset?: number, limit?: number } = {}): Promise<WorkoutPlansResponse> {
+    const params: any = { limit: limit.toString() };
+    if (page !== undefined) params.page = page.toString();
+    if (offset !== undefined) params.offset = offset.toString();
+
+    return this.api.get<WorkoutPlansResponse>('workout-plans/public', { params });
   }
 
   public async listMyLikedPlans({ page = 1, limit = 10 }: { page?: number, limit?: number }): Promise<WorkoutPlansResponse> {
