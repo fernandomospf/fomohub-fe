@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import {
@@ -15,7 +15,11 @@ import {
     FileCheck,
     CheckCircle2,
     Circle,
+    Pencil,
 } from "lucide-react";
+import Cropper from "react-easy-crop";
+import { supabase } from "@/lib/supabase";
+import { uploadAvatar } from "@/service/avatar";
 
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
@@ -59,6 +63,12 @@ export function Onboarding() {
     const router = useRouter();
     const [step, setStep] = useState(1);
     const totalSteps = 6;
+    
+    const [imageSrc, setImageSrc] = useState<string | null>(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const {
         setValue,
@@ -74,9 +84,11 @@ export function Onboarding() {
             objective: "",
             experience: "",
             frequency: "",
+            objectives: [] as string[],
             parqAnswers: new Array(PAR_Q_QUESTIONS.length).fill(null),
             acceptedTerms: false,
             acceptedMedical: false,
+            avatarUrl: "",
         },
     });
 
@@ -84,6 +96,7 @@ export function Onboarding() {
     const parqAnswers = formData.parqAnswers;
     const acceptedTerms = formData.acceptedTerms;
     const acceptedMedical = formData.acceptedMedical;
+    const selectedObjectives = formData.objectives || [];
 
     const progress = (step / totalSteps) * 100;
     const hasYesAnswer = parqAnswers.some((a: boolean | null) => a === true);
@@ -111,14 +124,127 @@ export function Onboarding() {
         setValue("parqAnswers", updated);
     };
 
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => setImageSrc(reader.result as string);
+        reader.readAsDataURL(file);
+    };
+
+    async function getCroppedImg(imageSrc: string, crop: any): Promise<File> {
+        const image = new Image();
+        image.src = imageSrc;
+
+        await new Promise((resolve) => {
+            image.onload = resolve;
+        });
+
+        const canvas = document.createElement("canvas");
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+
+        canvas.width = crop.width * scaleX;
+        canvas.height = crop.height * scaleY;
+
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(
+            image,
+            crop.x * scaleX,
+            crop.y * scaleY,
+            crop.width * scaleX,
+            crop.height * scaleY,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        return new Promise((resolve) => {
+            canvas.toBlob((blob) => {
+                resolve(new File([blob!], "avatar.jpg", { type: "image/jpeg" }));
+            }, "image/jpeg");
+        });
+    }
+
+    const handleSaveCroppedImage = async () => {
+        if (!imageSrc || !croppedAreaPixels) return;
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels);
+            const rawAvatarUrl = await uploadAvatar(croppedFile, user.id);
+            const avatarUrl = `${rawAvatarUrl}?t=${Date.now()}`;
+
+            setValue("avatarUrl", avatarUrl);
+            
+            await supabase
+                .from("profile_fitness_data")
+                .upsert(
+                    {
+                        user_id: user.id,
+                        avatar_url: avatarUrl,
+                        updated_at: new Date().toISOString(),
+                    },
+                    { onConflict: "user_id" }
+                );
+
+            setImageSrc(null);
+        } catch (error) {
+            console.error('Error saving cropped image:', error);
+        }
+    };
+
+    const isNameValid = (name: string) => {
+        if (!name || name.trim() === "") return false;
+        if (name.length > 14) return false;
+        return /^[A-Za-zÀ-ÿ]/.test(name);
+    };
+
+    const isDateValid = (dateString: string) => {
+        if (!dateString) return false;
+        const parts = dateString.split('-');
+        if (parts.length !== 3) return false;
+        const [year, month, day] = parts.map(Number);
+
+        if (year > 9999) return false;
+
+        const bDate = new Date(year, month - 1, day);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (bDate >= today) return false;
+
+        let age = today.getFullYear() - bDate.getFullYear();
+        const m = today.getMonth() - bDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < bDate.getDate())) {
+            age--;
+        }
+        return age >= 18;
+    };
+
+    const handleObjectiveToggle = (value: string) => {
+        const current = [...selectedObjectives];
+        const index = current.indexOf(value);
+        if (index > -1) {
+            current.splice(index, 1);
+        } else if (current.length < 2) {
+            current.push(value);
+        }
+        setValue("objectives", current);
+    };
+
     const canProceed = () => {
         switch (step) {
             case 1:
-                return formData.name.trim() !== "";
+                return isNameValid(formData.name) && isDateValid(formData.birthDate) && formData.gender !== "";
             case 2:
                 return formData.height !== "" && formData.weight !== "";
             case 3:
-                return formData.objective !== "";
+                return selectedObjectives.length > 0;
             case 4:
                 return formData.experience !== "" && formData.frequency !== "";
             case 5:
@@ -150,7 +276,7 @@ export function Onboarding() {
                 gender: data.gender,
                 heightCm: Number(data.height),
                 weightKg: Number(data.weight),
-                goal: data.objective,
+                goal: data.objectives.join(", "),
                 experienceLevel: data.experience,
                 trainingFrequency: data.frequency,
             },
@@ -178,7 +304,6 @@ export function Onboarding() {
 
     return (
         <div className="min-h-fit bg-background flex flex-col">
-            {/* Header */}
             <div className="px-5 pt-4 pb-2">
                 <div className="flex items-center justify-between mb-4">
                     {step > 1 ? (
@@ -196,27 +321,91 @@ export function Onboarding() {
                 <Progress value={progress} className="h-1" />
             </div>
 
-            {/* Content */}
             <div className="flex-1 px-5 py-6 overflow-y-auto">
                 {step === 1 && (
                     <div className="space-y-6 fade-in">
                         <div className="text-center space-y-3">
-                            <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto">
-                                <User className="w-10 h-10 text-primary" />
-                            </div>
                             <h1 className="text-2xl font-bold text-foreground">Vamos começar!</h1>
                             <p className="text-muted-foreground">Conte-nos um pouco sobre você</p>
                         </div>
 
                         <div className="space-y-4">
+                            <div className="relative w-24 h-24 mx-auto mb-4">
+                                <div 
+                                    className="w-full h-full rounded-full overflow-hidden border-4 border-primary/30 bg-secondary/30 flex items-center justify-center text-3xl font-bold text-primary cursor-pointer"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    {formData.avatarUrl ? (
+                                        <img
+                                            src={formData.avatarUrl}
+                                            alt="Avatar"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <User className="w-10 h-10 text-primary" />
+                                    )}
+                                </div>
+                                <div
+                                    className="absolute -top-1 -right-1 w-8 h-8 rounded-full gradient-primary flex items-center justify-center shadow-lg border-2 border-background cursor-pointer"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    <Pencil className="w-4 h-4 text-primary-foreground" />
+                                </div>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleAvatarChange}
+                                />
+                            </div>
+
+                            {imageSrc && (
+                                <div className="fixed inset-0 bg-black/70 z-50 flex flex-col items-center justify-center p-4">
+                                    <div className="relative w-full max-w-sm aspect-square bg-black rounded-xl overflow-hidden mb-6">
+                                        <Cropper
+                                            image={imageSrc}
+                                            crop={crop}
+                                            zoom={zoom}
+                                            aspect={1}
+                                            cropShape="round"
+                                            onCropChange={setCrop}
+                                            onZoomChange={setZoom}
+                                            onCropComplete={(_, croppedPixels) =>
+                                                setCroppedAreaPixels(croppedPixels)
+                                            }
+                                        />
+                                    </div>
+                                    <div className="flex gap-4 w-full max-w-sm">
+                                        <Button 
+                                            variant="secondary" 
+                                            className="flex-1"
+                                            onClick={() => setImageSrc(null)}
+                                        >
+                                            Cancelar
+                                        </Button>
+                                        <Button 
+                                            className="flex-1"
+                                            onClick={handleSaveCroppedImage}
+                                        >
+                                            Salvar
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="space-y-2">
                                 <Label>Como podemos te chamar?</Label>
                                 <Input
                                     placeholder="Seu nome"
                                     value={formData.name}
                                     onChange={(e) => updateFormData("name", e.target.value)}
-                                    className="bg-secondary border-border"
+                                    className={`bg-secondary ${formData.name && !isNameValid(formData.name) ? 'border-red-500' : 'border-border'}`}
+                                    maxLength={14}
                                 />
+                                <p className={`text-xs ${formData.name && !isNameValid(formData.name) ? 'text-red-500' : 'text-muted-foreground'}`}>
+                                    O nome não pode iniciar com números ou caracteres especiais e deve ter no máximo 14 caracteres.
+                                </p>
                             </div>
 
                             <div className="space-y-2">
@@ -224,9 +413,21 @@ export function Onboarding() {
                                 <Input
                                     type="date"
                                     value={formData.birthDate}
-                                    onChange={(e) => updateFormData("birthDate", e.target.value)}
-                                    className="bg-secondary border-border"
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        const year = val.split('-')[0];
+                                        if (year && year.length <= 4) {
+                                            updateFormData("birthDate", val);
+                                        } else if (!val) {
+                                            updateFormData("birthDate", "");
+                                        }
+                                    }}
+                                    max="9999-12-31"
+                                    className={`bg-secondary ${formData.birthDate && !isDateValid(formData.birthDate) ? 'border-red-500' : 'border-border'}`}
                                 />
+                                <p className={`text-xs ${formData.birthDate && !isDateValid(formData.birthDate) ? 'text-red-500' : 'text-muted-foreground'}`}>
+                                    * A idade mínima é de 18 anos.
+                                </p>
                             </div>
 
                             <div className="space-y-2">
@@ -243,10 +444,6 @@ export function Onboarding() {
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="feminino" id="feminino" />
                                         <Label htmlFor="feminino" className="cursor-pointer">Feminino</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="outro" id="outro" />
-                                        <Label htmlFor="outro" className="cursor-pointer">Outro</Label>
                                     </div>
                                 </RadioGroup>
                             </div>
@@ -268,10 +465,14 @@ export function Onboarding() {
                             <div className="space-y-2">
                                 <Label>Altura (cm)</Label>
                                 <Input
-                                    type="number"
+                                    type="text"
+                                    inputMode="numeric"
                                     placeholder="Ex: 175"
                                     value={formData.height}
-                                    onChange={(e) => updateFormData("height", e.target.value)}
+                                    onChange={(e) => {
+                                        const val = e.target.value.replace(/\D/g, "").slice(0, 3);
+                                        updateFormData("height", val);
+                                    }}
                                     className="bg-secondary border-border"
                                 />
                             </div>
@@ -279,10 +480,29 @@ export function Onboarding() {
                             <div className="space-y-2">
                                 <Label>Peso atual (kg)</Label>
                                 <Input
-                                    type="number"
+                                    type="text"
+                                    inputMode="numeric"
                                     placeholder="Ex: 70"
                                     value={formData.weight}
-                                    onChange={(e) => updateFormData("weight", e.target.value)}
+                                    onChange={(e) => {
+                                        let val = e.target.value
+                                            .replace(",", ".")
+                                            .replace(/[^\d.]/g, "");
+                                        
+                                        const parts = val.split(".");
+                                        if (parts.length > 2) {
+                                            val = parts[0] + "." + parts.slice(1).join("");
+                                        }
+
+                                        if (val.includes(".")) {
+                                            const [int, dec] = val.split(".");
+                                            val = `${int.slice(0, 3)}.${dec.slice(0, 1)}`;
+                                        } else {
+                                            val = val.slice(0, 3);
+                                        }
+                                        
+                                        updateFormData("weight", val);
+                                    }}
                                     className="bg-secondary border-border"
                                 />
                             </div>
@@ -309,35 +529,38 @@ export function Onboarding() {
                                 <Target className="w-10 h-10 text-primary" />
                             </div>
                             <h1 className="text-2xl font-bold text-foreground">Qual seu objetivo?</h1>
-                            <p className="text-muted-foreground">Escolha o que mais se encaixa com você</p>
+                            <div className="space-y-1">
+                                <p className="text-muted-foreground">Escolha o que mais se encaixa com você</p>
+                                <p className="text-xs text-primary font-medium italic">
+                                    * Você pode selecionar até 2 objetivos
+                                </p>
+                            </div>
                         </div>
 
-                        <RadioGroup
-                            value={formData.objective}
-                            onValueChange={(value) => updateFormData("objective", value)}
-                            className="space-y-3"
-                        >
+                        <div className="space-y-3">
                             {objectives.map((obj) => (
                                 <div
                                     key={obj.value}
-                                    className={`question-card cursor-pointer ${formData.objective === obj.value ? 'border-primary' : ''}`}
-                                    onClick={() => updateFormData("objective", obj.value)}
+                                    className={`question-card cursor-pointer transition-all ${selectedObjectives.includes(obj.value) ? 'border-primary bg-primary/5' : ''} ${!selectedObjectives.includes(obj.value) && selectedObjectives.length >= 2 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    onClick={() => handleObjectiveToggle(obj.value)}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <RadioGroupItem value={obj.value} id={obj.value} />
+                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedObjectives.includes(obj.value) ? 'border-primary bg-primary' : 'border-muted-foreground'}`}>
+                                                {selectedObjectives.includes(obj.value) && <Check className="w-3 h-3 text-primary-foreground" />}
+                                            </div>
                                             <div>
                                                 <p className="text-foreground font-medium">{obj.label}</p>
                                                 <p className="text-muted-foreground text-sm">{obj.description}</p>
                                             </div>
                                         </div>
-                                        {formData.objective === obj.value && (
+                                        {selectedObjectives.includes(obj.value) && (
                                             <Check className="w-5 h-5 text-primary" />
                                         )}
                                     </div>
                                 </div>
                             ))}
-                        </RadioGroup>
+                        </div>
                     </div>
                 )}
 

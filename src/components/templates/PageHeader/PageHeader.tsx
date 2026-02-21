@@ -29,13 +29,14 @@ export function PageHeader({
   searchQuery = null,
   setSearchQuery = null,
   placeholder = "",
-  loading = false
+  loading = false,
+  onboardingCompleted = false
 }: PageHeaderProps) {
   const router = useRouter();
   const { data: profile } = useProfile();
   const { currentStatus, statusOptions, setCurrentStatus } = usePageHeaderStore();
 
-  return (
+  return onboardingCompleted ? (
     <header className="sticky top-0 z-40 glass-strong safe-top md:hidden">
       <div className="flex items-center justify-between h-16 px-4 gap-3">
         <div className="flex items-center gap-2 shrink-0">
@@ -168,6 +169,5 @@ export function PageHeader({
           </div>
         </div>
       </div>
-    </header>
-  );
+    </header>) : null
 }

@@ -45,12 +45,12 @@ const navItems = [
   // { icon: User, label: "Perfil", path: "/profile" },
 ];
 
-export function BottomNav() {
+export function BottomNav({ onboardingCompleted }: { onboardingCompleted?: boolean }) {
   const router = useRouter();
   const pathname = router.pathname;
   const [showMore, setShowMore] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
-  
+
   const { data: profile } = useProfile();
   const { currentStatus, statusOptions, setCurrentStatus } = usePageHeaderStore();
 
@@ -79,13 +79,13 @@ export function BottomNav() {
     return path === "/" ? pathname === "/" : pathname.startsWith(path);
   };
 
-  return (
+  return onboardingCompleted ? (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass-strong safe-bottom md:top-0 md:bottom-auto md:w-64 md:h-[100dvh] md:border-r md:border-white/10 md:bg-background/95 md:backdrop-blur-xl md:p-6 md:flex md:flex-col md:justify-between">
       <div className="relative md:flex-1 md:flex md:flex-col">
         {/* Desktop Logo */}
         <div className="hidden md:flex items-center justify-between mb-10 px-2">
           <Image src="/fomo-logo.png" alt="Fomo Logo" width={40} height={40} loading="eager" className="rounded-xl" />
-          
+
           {(profile?.avatar_url && router.pathname !== "/profile") && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -98,10 +98,9 @@ export function BottomNav() {
               <DropdownMenuContent className={`w-56 ${GeistSans.className} mt-2`} align="end" forceMount>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className="gap-2">
-                    <Circle className={`w-3 h-3 fill-current ${
-                      currentStatus === "online" ? "text-green-500" :
-                      currentStatus === "away" ? "text-yellow-500" : "text-red-500"
-                    }`} />
+                    <Circle className={`w-3 h-3 fill-current ${currentStatus === "online" ? "text-green-500" :
+                        currentStatus === "away" ? "text-yellow-500" : "text-red-500"
+                      }`} />
                     <span>Status</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
@@ -229,8 +228,7 @@ export function BottomNav() {
             </div>
           </div>
         )}
-        
+
       </div>
-    </nav>
-  );
+    </nav>) : null
 }

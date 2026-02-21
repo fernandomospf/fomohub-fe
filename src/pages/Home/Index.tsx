@@ -233,6 +233,7 @@ export default function Index() {
   }
 
   const filteredPlans = filteredWorkoutPlan();
+  const ONBOARDING_COMPLETED = userData?.onboarding_completed;
 
   return (
     <MobileLayout ref={scrollContainerRef}>
@@ -241,6 +242,7 @@ export default function Index() {
         setSearchQuery={handleSearch}
         placeholder={t("home.search_placeholder")}
         loading={loading}
+        onboardingCompleted={ONBOARDING_COMPLETED}
       />
       {showDevModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
@@ -273,7 +275,7 @@ export default function Index() {
           </div>
         </div>
       )}
-      {userData?.onboarding_completed ? (
+      {ONBOARDING_COMPLETED ? (
         <>
           <div className="px-4 py-6 space-y-6">
             {

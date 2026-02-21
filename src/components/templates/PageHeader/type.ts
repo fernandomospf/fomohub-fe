@@ -14,6 +14,7 @@ export interface PageHeaderProps {
   setSearchQuery?: ((value: string) => void) | null;
   placeholder?: string;
   loading?: boolean;
+  onboardingCompleted?: boolean;
 }
 
 export interface PageHeaderState {
