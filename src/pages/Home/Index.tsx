@@ -133,6 +133,8 @@ export default function Index() {
     if (sessionLoading || !session) return;
     if (workoutPlan.length === 0) {
       loadTrendingPlans(0, false);
+    } else {
+      setLoadingInitial(false);
     }
   }, [session, sessionLoading]);
 
