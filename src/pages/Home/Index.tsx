@@ -19,7 +19,6 @@ import { IndexSkeleton } from "@/components/organisms/IndexSkeleton";
 import { WorkoutCardSkeleton } from "@/components/atoms/SkeletonWorkout";
 import { TrendingPlans } from "@/components/organisms/TrendingPlans";
 import { Onboarding } from "../Onboarding";
-import { Input } from "@/components/atoms/input";
 import { ActiveWorkoutBanner } from "@/components/organisms/workout/ActiveWorkoutBanner";
 import { useMe } from "@/hooks/useMe";
 import { useLastTraining } from "@/hooks/useLastTraining";
@@ -208,7 +207,7 @@ export default function Index() {
   if (sessionLoading || (session && loading)) {
     return (
       <MobileLayout ref={scrollContainerRef}>
-        <PageHeader />
+        <PageHeader loading={true} />
         <IndexSkeleton />
       </MobileLayout>
     );
@@ -241,6 +240,7 @@ export default function Index() {
         searchQuery={filters.search}
         setSearchQuery={handleSearch}
         placeholder={t("home.search_placeholder")}
+        loading={loading}
       />
       {showDevModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">

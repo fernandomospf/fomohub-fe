@@ -20,6 +20,7 @@ import { GeistSans } from "geist/font/sans";
 import { usePageHeaderStore } from "./store";
 import { PageHeaderProps } from "./type";
 import { Input } from "@/components/atoms/input";
+import { Skeleton } from "@/components/atoms/skeleton";
 
 export function PageHeader({ 
   title = "", 
@@ -27,7 +28,8 @@ export function PageHeader({
   rightElement,
   searchQuery = null,
   setSearchQuery = null,
-  placeholder = ""
+  placeholder = "",
+  loading = false
 }: PageHeaderProps) {
   const router = useRouter();
   const { data: profile } = useProfile();
@@ -37,7 +39,9 @@ export function PageHeader({
     <header className="sticky top-0 z-40 glass-strong safe-top md:hidden">
       <div className="flex items-center justify-between h-16 px-4 gap-3">
         <div className="flex items-center gap-2 shrink-0">
-          {showBack && (
+          {loading ? (
+            <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+          ) : showBack ? (
             <Button
               variant="ghost"
               size="icon-sm"
@@ -46,21 +50,32 @@ export function PageHeader({
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
+          ) : (
+            <Image src="/fomo-logo.png" alt="Fomo Logo" width={40} height={40} loading="eager" className="md:hidden shrink-0" />
           )}
-          {!showBack && <Image src="/fomo-logo.png" alt="Fomo Logo" width={40} height={40} loading="eager" className="md:hidden shrink-0" />}
-          {title && <h1 className="text-lg font-bold truncate max-w-[140px]">{title}</h1>}
+          {loading && title ? (
+            <Skeleton className="h-6 w-24" />
+          ) : title && (
+            <h1 className="text-lg font-bold truncate max-w-[140px]">{title}</h1>
+          )}
         </div>
         
         {
           (searchQuery !== null && setSearchQuery !== null) && (
             <div className="relative flex-1 w-full max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder={placeholder}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-10 bg-secondary border-0 rounded-xl w-full text-sm"
-              />
+              {loading ? (
+                <Skeleton className="h-10 w-full rounded-xl" />
+              ) : (
+                <>
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder={placeholder}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 h-10 bg-secondary border-0 rounded-xl w-full text-sm"
+                  />
+                </>
+              )}
             </div>
           )
         }
@@ -68,6 +83,12 @@ export function PageHeader({
         <div className="flex items-center gap-2 shrink-0">
           {rightElement}
           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative group hover:bg-transparent -mr-2 focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none focus:ring-0 outline-none">
+                <Bell className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-red-500 border-2 border-background" />
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className={`w-80 ${GeistSans.className}`}>
               <div className="flex flex-col p-4">
                 <h3 className="text-sm font-bold mb-2">Notificações</h3>
@@ -79,7 +100,9 @@ export function PageHeader({
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="md:hidden">
-            {(profile?.avatar_url && router.pathname !== "/profile") && (
+            {loading ? (
+              <Skeleton className="w-10 h-10 rounded-full" />
+            ) : (profile?.avatar_url && router.pathname !== "/profile") && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">

@@ -13,6 +13,7 @@ export interface PageHeaderProps {
   searchQuery?: string | null;
   setSearchQuery?: ((value: string) => void) | null;
   placeholder?: string;
+  loading?: boolean;
 }
 
 export interface PageHeaderState {
