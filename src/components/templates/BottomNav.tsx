@@ -91,7 +91,7 @@ export function BottomNav({ onboardingCompleted = true, loading = false }: { onb
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 group">
-                  <ProfileCircle picture={profile.avatar_url}>
+                  <ProfileCircle picture={profile.avatar_url} status={currentStatus}>
                     <Status status={currentStatus} />
                   </ProfileCircle>
                 </Button>

@@ -109,11 +109,11 @@ export function PageHeader({
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
                     {
                       profile?.avatar_url ? (
-                        <ProfileCircle picture={profile.avatar_url}>
+                        <ProfileCircle picture={profile.avatar_url} status={currentStatus}>
                           <Status status={currentStatus} />
                         </ProfileCircle>
                       ) : (
-                        <ProfileCircle username={profile?.social_name}>
+                        <ProfileCircle username={profile?.social_name} status={currentStatus}>
                           <Status status={currentStatus} />
                         </ProfileCircle>
                       )
