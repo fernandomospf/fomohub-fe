@@ -7,10 +7,11 @@ interface MobileLayoutProps {
   hideNav?: boolean;
   className?: string;
   onboardingCompleted?: boolean;
+  loading?: boolean;
 }
 
 export const MobileLayout = forwardRef<HTMLDivElement, MobileLayoutProps>(
-  ({ children, hideNav, className = "", onboardingCompleted }, ref) => {
+  ({ children, hideNav, className = "", onboardingCompleted, loading }, ref) => {
     return (
       <div className={`min-h-[100dvh] h-[100dvh] flex flex-col ${className}`}>
         <main
@@ -19,7 +20,7 @@ export const MobileLayout = forwardRef<HTMLDivElement, MobileLayoutProps>(
         >
           {children}
         </main>
-        {!hideNav && <BottomNav onboardingCompleted={onboardingCompleted} />}
+        {!hideNav && <BottomNav onboardingCompleted={onboardingCompleted} loading={loading} />}
       </div>
     );
   }

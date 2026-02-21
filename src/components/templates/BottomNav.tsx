@@ -45,7 +45,7 @@ const navItems = [
   // { icon: User, label: "Perfil", path: "/profile" },
 ];
 
-export function BottomNav({ onboardingCompleted }: { onboardingCompleted?: boolean }) {
+export function BottomNav({ onboardingCompleted = true, loading = false }: { onboardingCompleted?: boolean, loading?: boolean }) {
   const router = useRouter();
   const pathname = router.pathname;
   const [showMore, setShowMore] = useState(false);
@@ -79,7 +79,8 @@ export function BottomNav({ onboardingCompleted }: { onboardingCompleted?: boole
     return path === "/" ? pathname === "/" : pathname.startsWith(path);
   };
 
-  return onboardingCompleted ? (
+  const SHOULD_RENDER = onboardingCompleted && !loading;
+  return SHOULD_RENDER ? (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass-strong safe-bottom md:top-0 md:bottom-auto md:w-64 md:h-[100dvh] md:border-r md:border-white/10 md:bg-background/95 md:backdrop-blur-xl md:p-6 md:flex md:flex-col md:justify-between">
       <div className="relative md:flex-1 md:flex md:flex-col">
         {/* Desktop Logo */}

@@ -236,7 +236,11 @@ export default function Index() {
   const ONBOARDING_COMPLETED = userData?.onboarding_completed;
 
   return (
-    <MobileLayout ref={scrollContainerRef}>
+    <MobileLayout 
+      ref={scrollContainerRef} 
+      loading={loading} 
+      onboardingCompleted={ONBOARDING_COMPLETED}
+    >
       <PageHeader
         searchQuery={filters.search}
         setSearchQuery={handleSearch}
