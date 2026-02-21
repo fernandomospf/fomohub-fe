@@ -210,15 +210,6 @@ export default function Workouts() {
         </div>
       ) : (
         <div className="px-4 py-6 space-y-6">
-          <div className="relative mb-4">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              placeholder="Buscar treinos..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 bg-secondary border-0 rounded-xl"
-            />
-          </div>
           <div className="flex flex-col gap-2">
             <Link href="/workouts/new">
               <div className="glass rounded-2xl p-4 flex items-center gap-4 border-dashed border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">

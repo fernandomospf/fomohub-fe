@@ -10,6 +10,9 @@ export interface PageHeaderProps {
   title?: string;
   showBack?: boolean;
   rightElement?: React.ReactNode;
+  searchQuery?: string | null;
+  setSearchQuery?: ((value: string) => void) | null;
+  placeholder?: string;
 }
 
 export interface PageHeaderState {

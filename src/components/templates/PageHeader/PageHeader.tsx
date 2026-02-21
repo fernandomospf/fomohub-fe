@@ -1,4 +1,4 @@
-import { ArrowLeft, User, Settings, LogOut, Circle, Bell } from "lucide-react";
+import { ArrowLeft, User, Settings, LogOut, Circle, Bell, Search } from "lucide-react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/atoms/button";
 import Image from "next/image";
@@ -19,33 +19,53 @@ import { supabase } from "@/lib/supabase";
 import { GeistSans } from "geist/font/sans";
 import { usePageHeaderStore } from "./store";
 import { PageHeaderProps } from "./type";
+import { Input } from "@/components/atoms/input";
 
-export function PageHeader({ title = "", showBack, rightElement }: PageHeaderProps) {
+export function PageHeader({ 
+  title = "", 
+  showBack, 
+  rightElement,
+  searchQuery = null,
+  setSearchQuery = null,
+  placeholder = ""
+}: PageHeaderProps) {
   const router = useRouter();
   const { data: profile } = useProfile();
   const { currentStatus, statusOptions, setCurrentStatus } = usePageHeaderStore();
-  const notificationCount = 5;
-  const hasNotifications = notificationCount > 0;
-  const notificationLabel = notificationCount > 99 ? "99+" : String(notificationCount);
 
   return (
     <header className="sticky top-0 z-40 glass-strong safe-top md:hidden">
-      <div className="flex items-center justify-between h-16 px-4">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between h-16 px-4 gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           {showBack && (
             <Button
               variant="ghost"
               size="icon-sm"
               onClick={() => router.back()}
-              className="rounded-full"
+              className="rounded-full shrink-0"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
           )}
-          <Image src="/fomo-logo.png" alt="Fomo Logo" width={60} height={60} loading="eager" className="md:hidden" />
-          <h1 className="text-lg font-bold md:ml-2">{title}</h1>
+          {!showBack && <Image src="/fomo-logo.png" alt="Fomo Logo" width={40} height={40} loading="eager" className="md:hidden shrink-0" />}
+          {title && <h1 className="text-lg font-bold truncate max-w-[140px]">{title}</h1>}
         </div>
-        <div className="flex items-center gap-2">
+        
+        {
+          (searchQuery !== null && setSearchQuery !== null) && (
+            <div className="relative flex-1 w-full max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder={placeholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 h-10 bg-secondary border-0 rounded-xl w-full text-sm"
+              />
+            </div>
+          )
+        }
+
+        <div className="flex items-center gap-2 shrink-0">
           {rightElement}
           <DropdownMenu>
             <DropdownMenuContent align="end" className={`w-80 ${GeistSans.className}`}>
@@ -71,10 +91,9 @@ export function PageHeader({ title = "", showBack, rightElement }: PageHeaderPro
                 <DropdownMenuContent className={`w-56 ${GeistSans.className}`} align="end" forceMount>
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className="gap-2">
-                      <Circle className={`w-3 h-3 fill-current ${
-                        currentStatus === "online" ? "text-green-500" :
+                      <Circle className={`w-3 h-3 fill-current ${currentStatus === "online" ? "text-green-500" :
                         currentStatus === "away" ? "text-yellow-500" : "text-red-500"
-                      }`} />
+                        }`} />
                       <span>Status</span>
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>

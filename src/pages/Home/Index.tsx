@@ -163,7 +163,11 @@ export default function Index() {
 
   return (
     <MobileLayout>
-      <PageHeader />
+      <PageHeader 
+        searchQuery={filters.search}
+        setSearchQuery={handleSearch}
+        placeholder={t("home.search_placeholder")}
+      />
       {showDevModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="glass rounded-2xl p-6 max-w-md w-full space-y-4">
@@ -199,16 +203,6 @@ export default function Index() {
         <>
           <div className="px-4 py-6 space-y-6">
             <div className="space-y-3">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  placeholder={t("home.search_placeholder")}
-                  value={filters.search}
-                  onChange={handleSearch}
-                  className="pl-12 h-12 bg-secondary border-0 rounded-xl"
-                />
-
-              </div>
               <Button
                 variant={showFilters ? "gradient" : "outline"}
                 className="mx-auto w-30"

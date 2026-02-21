@@ -69,9 +69,9 @@ export const useHomeStore = create<HomeStore>((set, get) => ({
           return matchesTag && matchesSearch;
         });
       },
-      handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => {
+      handleSearch: (search: string) => {
         const { setFilters, filters } = get();
-        setFilters({ ...filters, search: e.target.value });
+        setFilters({ ...filters, search });
       },
       handleSelectedTag: (tagName: string) => {
         const { setFilters, filters } = get();
