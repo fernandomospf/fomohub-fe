@@ -10,25 +10,34 @@ import { useState } from "react";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "next-themes";
+import Head from "next/head";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-      <QueryClientProvider client={queryClient}>
-        <LanguageProvider>
-          <WorkoutSessionProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <div className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-                <Component {...pageProps} />
-              </div>
-            </TooltipProvider>
-          </WorkoutSessionProvider>
-        </LanguageProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <>
+      <Head>
+        <title>Fomo</title>
+        <meta name="description" content="Fomo - Focus On Moving On" />
+        <link rel="icon" href="/fomo-logo.png" />
+      </Head>
+
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <QueryClientProvider client={queryClient}>
+          <LanguageProvider>
+            <WorkoutSessionProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <div className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+                  <Component {...pageProps} />
+                </div>
+              </TooltipProvider>
+            </WorkoutSessionProvider>
+          </LanguageProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </>
   );
 }
