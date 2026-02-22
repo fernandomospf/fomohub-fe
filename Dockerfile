@@ -1,4 +1,4 @@
-FROM node:20-alpine as builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -11,13 +11,16 @@ ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_IRONHUB_API_URL=$NEXT_PUBLIC_IRONHUB_API_URL
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 RUN npm run build
+
 
 FROM nginx:stable-alpine
 
 COPY --from=builder /app/out /usr/share/nginx/html
 
 EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
